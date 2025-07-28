@@ -1,0 +1,16 @@
+# .htaccess
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END cPanel-generated php ini directives, do not edit
+
+<FilesMatch ".(php4|php5|php3|php2|php|phtml)$">
+AddHandler application/x-httpd-alt-php83___lsphp .php
+</FilesMatch>
+
