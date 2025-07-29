@@ -18,18 +18,29 @@ $layout_page = shop_product_detail
       <div class="col-lg-8 col-sm-12">
           <div class=" product-section-heading  position-relative">
         <!-- Left floating image -->
-        <img src="/images/2 (2).png" alt="Chart"
+        <img src="{{url($product->image)}}" alt="Chart"
              class="floating-icon-left-product ">
 
         <!-- Heading and Subheading -->
         
-        <h1>{{ $product->name }}</h1>
+      @php
+    $name = strip_tags($product->name);
+    $words = explode(' ', $name, 2);
+    $firstWord = $words[0];
+    $rest = isset($words[1]) ? ' ' . $words[1] : '';
+@endphp
+
+<h1>
+    <span class="text-primary">{{ $firstWord }}</span>{{ $rest }}
+</h1>
+
+
             <!--<img src="/images/Google logo.svg" alt="">-->
         
-       {!! $product->description !!}
-
+       
+         
         <!-- Right floating image -->
-        <img src="/images/4 3.png" alt="Target"
+        <img src="{{url($product->images[0]->image)}}" alt="Target"
              class="floating-icon-right-product">
 
              <div class="product-section-btn">
@@ -45,7 +56,7 @@ $layout_page = shop_product_detail
                 {{-- Button add to cart --}}
                 @if ($product->kind != GP247_PRODUCT_GROUP && $product->allowSale() && gp247_config('product_use_button_add_to_cart'))
                
-                      <input class="form-input" name="qty" type="number" data-zeros="true" value="1" min="1" max="100">
+                      <!--<input class="form-input" name="qty" type="number" data-zeros="true" value="1" min="1" max="100">-->
                     
                       <button class="btn-products" type="submit" id="gp247-button-process">{{ gp247_language_render('action.add_to_cart') }}</button>
                     
@@ -68,41 +79,29 @@ $layout_page = shop_product_detail
   <div class="container">
     <div class="row g-4 text-start">
 
-      <!-- Box 1 -->
-      <div class="col-6 col-md-6 col-lg-3">
-        <div class="feature-box p-4 h-100">
-          <img src="/images/2 2.png" alt="" class="img-fluid mb-2">
-          <h6>Expert</h6>
-          <p >Expert GTM Professionals</p>
-        </div>
-      </div>
+      @for ($i = 1; $i <= 4; $i++)
+        @php
+            $name = $product->{'usp_'.$i.'_name'} ?? null;
+            $image = $product->{'usp_'.$i.'_image'} ?? null;
+            $content = $product->{'usp_'.$i.'_content'} ?? null;
+        @endphp
 
-      <!-- Box 2 -->
-      <div class="col-6 col-md-6 col-lg-3">
-        <div class="feature-box p-4 h-100">
-          <img src="/images/35.png" alt="" class="img-fluid mb-2">
-          <h6>Fixed price</h6>
-          <p class="text-muted mb-0">Fixed Price, No Surprises</p>
-        </div>
-      </div>
-
-      <!-- Box 3 -->
-      <div class="col-6 col-md-6 col-lg-3">
-        <div class="feature-box p-4 h-100">
-          <img src="/images/2 5.png" alt="" class="img-fluid mb-2">
-          <h6>Guaranteed</h6>
-          <p class="text-muted mb-0">Guaranteed Fix or Your money</p>
-        </div>
-      </div>
-
-      <!-- Box 4 -->
-      <div class="col-6 col-md-6 col-lg-3">
-        <div class="feature-box p-4 h-100">
-          <img src="/images/2 6.png" alt="" class="img-fluid mb-2">
-          <h6>Same Day</h6>
-          <p class="text-muted mb-0">Same-Day Delivery (within 24h)</p>
-        </div>
-      </div>
+        @if ($name || $image || $content)
+          <div class="col-6 col-md-6 col-lg-3">
+            <div class="feature-box p-4 h-100">
+              @if ($image)
+                <img src="{{ url($image) }}" alt="" class="img-fluid mb-2">
+              @endif
+              @if ($name)
+                <h6>{{ $name }}</h6>
+              @endif
+              @if ($content)
+                <p class="text-muted mb-0">{{ $content }}</p>
+              @endif
+            </div>
+          </div>
+        @endif
+      @endfor
 
     </div>
   </div>
@@ -110,103 +109,89 @@ $layout_page = shop_product_detail
 
 
 <!-- What you Got -->
-  <section class="whatyougot"> 
-    <div class="container">
-        <div class="row  g-2 justify-content-center">
-            <div class="col-12 ">
-                <div class="whatyougot-heading text-center">
-                    <h2>Here What you Got</h2>
-                    <p>Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.</p>
-                </div>
-            </div>
-          
-            <div class="col-lg-4 col-12  text-md-center ">
-                <div class="whatyougot-img ">
-                  <img src="/images/whatyougetimg.png" class="img-fluid" alt="">
-                </div>
-            </div>
-            <div class="col-lg-6 col-12">
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>Comprehensive GTM container debug and audit
-
-                </p></div>
-            </div>
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>Configuration and fix for up to 3 key event triggers (e.g., clicks, form submissions)
-
-                </p></div>
-            </div>
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>
-                  Verification of data flow to Google Analytics (or other specified platform)
-                </p></div>
-            </div>
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>
-                      Quality assurance testing across major browsers
-                </p></div>
-            </div>
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>
-                         A concise report detailing fixes and recommendations
-                </p></div>
-            </div>
-              <div class="whatyougot-content">
-                <div class="whatyougoticon"><img src="/images/whatyougeticonimg.png" class="img-fluid" alt=""></div>
-                <div><p>
-                      detailing fixes and recommendations
-                </p></div>
-            </div>
-
-            </div>
-             
+  <!-- What you Got -->
+<section class="whatyougot"> 
+  <div class="container">
+    <div class="row g-2 justify-content-center">
+      
+      <div class="col-12">
+        <div class="whatyougot-heading text-center">
+          <h2>{{ $product->what_heading }}</h2>
+          <p>
+            {{ $product->what_subheading }}
+          </p>
         </div>
+      </div>
+
+      <div class="col-lg-4 col-12 text-md-center">
+        <div class="whatyougot-img">
+          <img src="{{url($product->what_image)}}" class="img-fluid" alt="">
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-12">
+        @php
+          // This depends on your structure
+          $items = $product->what_items ?? [];
+          if (is_string($items)) $items = json_decode($items, true);
+        @endphp
+
+        @foreach ($items as $item)
+          @if (!empty($item))
+            <div class="whatyougot-content">
+              <div class="whatyougoticon">
+                <img src="/images/whatyougeticonimg.png" class="img-fluid" alt="">
+              </div>
+              <div><p>{{ $item }}</p></div>
+            </div>
+          @endif
+        @endforeach
+
+      </div>
+
     </div>
- </section> 
+  </div>
+</section>
+
 
 <!-- problem-cardsection  -->
 
 
 <section class="problem-card-section">
-    <div class="container py-5">
-  <!-- Top Section: Problems -->
-  <h2>Frustrated with GTM Issues?</h2>
-  <div class="row g-4 justify-content-center">
-    <div class="col-md-3 col-sm-6">
-      <div class="problem-card">
-        <img src="/images/2 2 (1).png" alt="" width="50">
-        <h5>Tags not firing correctly?</h5>
-        <p >Sorry, the page you are looking for doesn’t exist or has been removed. Keep exploring out site:</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-      <div class="problem-card">
-        <img src="/images/2 3.png" alt="" width="50">
-        <h5>Frustrating setup errors?</h5>
-         <p >Sorry, the page you are looking for doesn’t exist or has been removed. Keep exploring out site:</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-      <div class="problem-card">
-        <img src="/images/2 3 (1).png" alt="" width="50">
-        <h5>Missing conversion data?</h5>
-         <p >Sorry, the page you are looking for doesn’t exist or has been removed. Keep exploring out site:</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-      <div class="problem-card">
-        <img src="/images/2 2 (1).png" alt="" width="50">
-        <h5 >Missing conversion data?</h5>
-        <p >Sorry, the page you are looking for doesn’t exist or has been removed. Keep exploring out site:</p>
-      </div>
+  <div class="container py-5">
+    <h2>Frustrated with product Issues?</h2>
+    <div class="row g-4 justify-content-center">
+
+      @php
+        $frus = [];
+
+        for ($i = 1; $i <= 4; $i++) {
+          $frus[] = [
+            'image' => $product->{'frus_' . $i . '_image'} ?? '',
+            'name' => $product->{'frus_' . $i . '_name'} ?? '',
+            'content' => $product->{'frus_' . $i . '_content'} ?? '',
+          ];
+        }
+      @endphp
+
+      @foreach ($frus as $item)
+        @if ($item['name'] || $item['content'])
+        <div class="col-md-3 col-sm-6">
+          <div class="problem-card h-100 text-center p-3">
+            @if ($item['image'])
+              <img src="{{ url($item['image']) }}" alt="" width="50" class="mb-2">
+            @endif
+            <h5>{{ $item['name'] }}</h5>
+            <p>{{ $item['content'] }}</p>
+          </div>
+        </div>
+        @endif
+      @endforeach
+
     </div>
   </div>
 </section>
+
 
 
 <!-- price-section  -->
@@ -392,78 +377,52 @@ $layout_page = shop_product_detail
 
 
 <!-- Fanq -->
-
 <section class="faq-section py-5">
   <div class="container">
     <h2 class="text-center mb-4">FAQs ?</h2>
-    <div class="accordion faqsList " id="faqAccordion">
-      <!-- Item 1 (open by default) -->
-      <div class="accordion-item mb-3 rounded shadow-sm">
-        <h2 class="accordion-header" id="faqHeadingOne">
-          <button class="accordion-button" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#faqCollapseOne"
-            aria-expanded="true"
-            aria-controls="faqCollapseOne">
-           What is Webflow and why is it the best website builder?
-          </button>
-        </h2>
-        <div id="faqCollapseOne"
-             class="accordion-collapse collapse show"
-             aria-labelledby="faqHeadingOne"
-             data-bs-parent="#faqAccordion">
-          <div class="accordion-body">
-            Webflow is a powerful visual development platform that allows designers to build fully responsive websites without writing a single line of code. It combines the flexibility of code with the simplicity of a visual editor, empowering creators to bring their ideas to life faster and more efficiently than ever before.
-          </div>
-        </div>
-      </div>
 
-      <!-- Item 2 -->
-      <div class="accordion-item mb-3 rounded shadow-sm">
-        <h2 class="accordion-header" id="faqHeadingTwo">
-          <button class="accordion-button collapsed" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#faqCollapseTwo"
-            aria-expanded="false"
-            aria-controls="faqCollapseTwo">
-            What is your favorite template from BRIX Templates?
-          </button>
-        </h2>
-        <div id="faqCollapseTwo"
-             class="accordion-collapse collapse"
-             aria-labelledby="faqHeadingTwo"
-             data-bs-parent="#faqAccordion">
-          <div class="accordion-body">
-            Webflow is a powerful visual development platform that allows designers to build fully responsive websites without writing a single line of code. It combines the flexibility of code with the simplicity of a visual editor, empowering creators to bring their ideas to life faster and more efficiently than ever before.
-          </div>
-        </div>
-      </div>
+    @php
+      $faqItems = [];
+      $rawFaq = $product->faq ?? ($descriptions[$code]['faq'] ?? null);
 
-      <!-- Additional items similarly -->
-      <div class="accordion-item mb-3 rounded shadow-sm">
-        <h2 class="accordion-header" id="faqHeadingThree">
-          <button class="accordion-button collapsed" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#faqCollapseThree"
-            aria-expanded="false"
-            aria-controls="faqCollapseThree">
-            What is your favorite template from BRIX Templates?
-          </button>
-        </h2>
-        <div id="faqCollapseThree"
-             class="accordion-collapse collapse"
-             aria-labelledby="faqHeadingThree"
-             data-bs-parent="#faqAccordion">
-          <div class="accordion-body">
-            Webflow is a powerful visual development platform that allows designers to build fully responsive websites without writing a single line of code. It combines the flexibility of code with the simplicity of a visual editor, empowering creators to bring their ideas to life faster and more efficiently than ever before.
-          </div>
-        </div>
-      </div>
+      if (is_string($rawFaq)) {
+          $faqItems = json_decode($rawFaq, true) ?? [];
+      } elseif (is_array($rawFaq)) {
+          $faqItems = $rawFaq;
+      }
+    @endphp
 
-      <!-- Add more items as needed -->
-    </div>
+    @if (count($faqItems))
+      <div class="accordion faqsList" id="faqAccordion">
+        @foreach ($faqItems as $index => $faq)
+          <div class="accordion-item mb-3 rounded shadow-sm">
+            <h2 class="accordion-header" id="faqHeading{{ $index }}">
+              <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faqCollapse{{ $index }}"
+                      aria-expanded="{{ $index == 0 ? 'true' : 'false' }}"
+                      aria-controls="faqCollapse{{ $index }}">
+                {{ $faq['question'] ?? 'No question provided' }}
+              </button>
+            </h2>
+            <div id="faqCollapse{{ $index }}"
+                 class="accordion-collapse collapse {{ $index == 0 ? 'show' : '' }}"
+                 aria-labelledby="faqHeading{{ $index }}"
+                 data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                {{ $faq['answer'] ?? 'No answer provided' }}
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    @else
+      <p class="text-center">No FAQs available for this product.</p>
+    @endif
   </div>
 </section>
+
 
 @endsection
 {{-- block_main --}}

@@ -122,23 +122,195 @@
                             </div>
 
                         @if ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD)
-                            <div
-                                class="form-group row {{ $errors->has('descriptions.'.$code.'.content') ? ' text-red' : '' }}">
-                                <label for="{{ $code }}__content"
-                                    class="col-sm-2 col-form-label">{{ gp247_language_render('product.content') }}</label>
-                                <div class="col-sm-8">
-                                    <textarea id="{{ $code }}__content" class="editor"
-                                        name="descriptions[{{ $code }}][content]">
-                                        {{ old('descriptions.'.$code.'.content',($descriptions[$code]['content']??'')) }}</textarea>
-                                    @if ($errors->has('descriptions.'.$code.'.content'))
-                                    <span class="form-text">
-                                        <i class="fa fa-info-circle"></i>
-                                        {{ $errors->first('descriptions.'.$code.'.content') }}
-                                    </span>
-                                    @endif
-                                </div>
-                            </div>
+                            <!--<div-->
+                            <!--    class="form-group row {{ $errors->has('descriptions.'.$code.'.content') ? ' text-red' : '' }}">-->
+                            <!--    <label for="{{ $code }}__content"-->
+                            <!--        class="col-sm-2 col-form-label">{{ gp247_language_render('product.content') }}</label>-->
+                            <!--    <div class="col-sm-8">-->
+                            <!--        <textarea id="{{ $code }}__content" class="editor"-->
+                            <!--            name="descriptions[{{ $code }}][content]">-->
+                            <!--            {{ old('descriptions.'.$code.'.content',($descriptions[$code]['content']??'')) }}</textarea>-->
+                            <!--        @if ($errors->has('descriptions.'.$code.'.content'))-->
+                            <!--        <span class="form-text">-->
+                            <!--            <i class="fa fa-info-circle"></i>-->
+                            <!--            {{ $errors->first('descriptions.'.$code.'.content') }}-->
+                            <!--        </span>-->
+                            <!--        @endif-->
+                            <!--    </div>-->
+                            <!--</div>-->
                         @endif
+                        
+                        <hr>
+<h5 class="text-primary">Product usp</h5>
+
+@for ($i = 1; $i <= 4; $i++)
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">USP {{ $i }} Name</label>
+    <div class="col-sm-8">
+        <input type="text"
+            name="usps[{{ $i }}][name]"
+            value="{{ old("descriptions.$code.usp_{$i}_name", ($descriptions[$code]["usp_{$i}_name"] ?? '')) }}"
+            class="form-control" placeholder="USP {{ $i }} name">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">USP {{ $i }} Content</label>
+    <div class="col-sm-8">
+        <textarea name="usps[{{ $i }}][content]" class="form-control"
+            placeholder="USP {{ $i }} content">{{ old("descriptions.$code.usp_{$i}_content", ($descriptions[$code]["usp_{$i}_content"] ?? '')) }}</textarea>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">USP {{ $i }} Image</label>
+    <div class="col-sm-8">
+        <input type="file" name="usps[{{ $i }}][image]"   class="form-control-file">
+         <input type="hidden" name="usps[{{ $i }}][imageold]" value="{{ ($descriptions[$code]["usp_{$i}_image"] ?? '') }}" class="form-control-file">
+         
+        @if (!empty($descriptions[$code]["usp_{$i}_image"]))
+            <p class="mt-2">Current: <img src="{{ asset($descriptions[$code]["usp_{$i}_image"]) }}" alt="USP Image {{ $i }}" height="60"></p>
+        @endif
+    </div>
+</div>
+<hr>
+@endfor
+
+
+<hr>
+<h5 class="text-primary">What You Got </h5>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Heading</label>
+    <div class="col-sm-8">
+        <input type="text" name="descriptions[{{ $code }}][what_heading]" value="{{ old("descriptions.$code.what_heading", $descriptions[$code]['what_heading'] ?? '') }}" class="form-control">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Subheading</label>
+    <div class="col-sm-8">
+        <input type="text" name="descriptions[{{ $code }}][what_subheading]" value="{{ old("descriptions.$code.what_subheading", $descriptions[$code]['what_subheading'] ?? '') }}" class="form-control">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Image</label>
+    <div class="col-sm-8">
+        <input type="file" name="descriptions[{{ $code }}][what_image]" class="form-control-file">
+        <input type="hidden" name="descriptions[{{ $code }}][what_imageold]" value="{{ $descriptions[$code]['what_image'] ?? '' }}">
+        @if (!empty($descriptions[$code]['what_image']))
+            <img src="{{ asset($descriptions[$code]['what_image']) }}" alt="" height="60">
+        @endif
+    </div>
+</div>
+
+@php
+    // Decode 'what_items' if it's a JSON string
+    $items = old("descriptions.$code.what_items", $descriptions[$code]['what_items'] ?? []);
+    if (is_string($items)) {
+        $items = json_decode($items, true);
+    }
+    $items = is_array($items) ? $items : [];
+@endphp
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">What you got</label>
+    <div class="col-sm-8">
+        <div class="what-items-list">
+            @if (count($items))
+                @foreach ($items as $index => $item)
+                    <div class="input-group mb-2">
+                        <input type="text" name="descriptions[{{ $code }}][what_items][]" class="form-control" value="{{ $item }}" placeholder="Item text">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger btn-remove-item">×</button>
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                {{-- Show one blank input by default --}}
+                <div class="input-group mb-2">
+                    <input type="text" name="descriptions[{{ $code }}][what_items][]" class="form-control" placeholder="Item text">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-remove-item">×</button>
+                    </div>
+                </div>
+            @endif
+        </div>
+        <button type="button" class="btn btn-sm btn-success mt-2 btn-add-item">+ Add Item</button>
+    </div>
+</div>
+
+
+<!--Frustrated with  Issues?-->
+
+ <hr>
+<h5 class="text-primary">Frustrated with Product Issues?</h5>
+
+@for ($i = 1; $i <= 4; $i++)
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Frustrated {{ $i }} Name</label>
+    <div class="col-sm-8">
+        <input type="text"
+            name="frus[{{ $i }}][name]"
+            value="{{ old("descriptions.$code.frus_{$i}_name", ($descriptions[$code]["frus_{$i}_name"] ?? '')) }}"
+            class="form-control" placeholder="Frustrated {{ $i }} name">
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Frustrated {{ $i }} Content</label>
+    <div class="col-sm-8">
+        <textarea name="frus[{{ $i }}][content]" class="form-control"
+            placeholder="Frustrated {{ $i }} content">{{ old("descriptions.$code.frus_{$i}_content", ($descriptions[$code]["frus_{$i}_content"] ?? '')) }}</textarea>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Frustrated {{ $i }} Image</label>
+    <div class="col-sm-8">
+        <input type="file" name="frus[{{ $i }}][image]"   class="form-control-file">
+         <input type="hidden" name="frus[{{ $i }}][imageold]" value="{{ ($descriptions[$code]["frus_{$i}_image"] ?? '') }}" class="form-control-file">
+         
+        @if (!empty($descriptions[$code]["frus_{$i}_image"]))
+            <p class="mt-2">Current: <img src="{{ asset($descriptions[$code]["frus_{$i}_image"]) }}" alt="Frustrated Image {{ $i }}" height="60"></p>
+        @endif
+    </div>
+</div>
+<hr>
+@endfor
+  
+  <!--faq-->
+ @php
+    $faqItems = $descriptions[$code]['faq'] ?? []; // fallback to empty array if not set
+    if (is_string($faqItems)) {
+        $faqItems = json_decode($faqItems, true);
+    }
+@endphp
+
+
+
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">FAQs</label>
+    <div class="col-sm-8 faq-items-list">
+        @foreach ($faqItems as $index => $faq)
+            <div class="faq-entry input-group mb-2">
+                <input type="text" name="descriptions[{{ $code }}][faq][{{ $index }}][question]" class="form-control mr-1" placeholder="Question" value="{{ $faq['question'] ?? '' }}">
+                <input type="text" name="descriptions[{{ $code }}][faq][{{ $index }}][answer]" class="form-control mr-1" placeholder="Answer" value="{{ $faq['answer'] ?? '' }}">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger btn-remove-faq">×</button>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    <div class="col-sm-8 offset-sm-2 mt-2">
+        <button type="button" class="btn btn-sm btn-primary btn-add-faq">Add FAQ</button>
+    </div>
+</div>
+
+
+
+
                         </div>
                     </div>
                     @endforeach
@@ -340,90 +512,10 @@
                         </div>
                         {{-- //Alias --}}
 
-@if (gp247_config_admin('product_brand') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- Brand --}}
-                        <div class="form-group row kind kind0 kind1 {{ $errors->has('brand_id') ? ' text-red' : '' }}">
-                            <label for="brand_id" class="col-sm-2 col-form-label">{{ gp247_language_render('product.brand') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <select class="form-control brand_id select2"
-                                    name="brand_id">
-                                    <option value=""></option>
-                                    @foreach ($brands as $k => $v)
-                                    <option value="{{ $k }}"
-                                        {{ (old('brand_id') ==$k || (!old() && $product->brand_id ==$k) ) ? 'selected':'' }}>
-                                        {{ $v->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="input-group-append">
-                                    <a target=_new href="{{ gp247_route_admin('admin_brand.index') }}" class="btn  btn-flat" title="New">
-                                        <i class="fa fa-plus" title="{{ gp247_language_render('action.add') }}"></i>
-                                     </a>
-                                </div>
-                                </div>
-                                @if ($errors->has('brand_id'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('brand_id') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //Brand --}}
-@endif
 
-@if (gp247_config_admin('product_supplier') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- supplier --}}
-                        <div class="form-group row kind kind0 kind1 {{ $errors->has('supplier_id') ? ' text-red' : '' }}">
-                            <label for="supplier_id" class="col-sm-2 col-form-label">{{ gp247_language_render('product.supplier') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <select class="form-control supplier_id select2" 
-                                    name="supplier_id">
-                                    <option value=""></option>
-                                    @foreach ($suppliers as $k => $v)
-                                    <option value="{{ $k }}"
-                                        {{ (old('supplier_id') ==$k || (!old() && $product->supplier_id ==$k) ) ? 'selected':'' }}>
-                                        {{ $v->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="input-group-append">
-                                    <a target=_new href="{{ gp247_route_admin('admin_supplier.index') }}" class="btn  btn-flat" title="New">
-                                        <i class="fa fa-plus" title="{{ gp247_language_render('action.add') }}"></i>
-                                     </a>
-                                </div>
-                                </div>
-                                @if ($errors->has('supplier_id'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('supplier_id') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //supplier --}}
-@endif
 
-@if (gp247_config_admin('product_cost') && ($product->kind == GP247_PRODUCT_SINGLE))
-                        {{-- Cost --}}
-                        <div class="form-group row kind kind0 kind1  {{ $errors->has('cost') ? ' text-red' : '' }}">
-                            <label for="cost" class="col-sm-2 col-form-label">{{ gp247_language_render('product.cost') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" min="0" step="0.01" style="width: 100px;" id="cost" name="cost"
-                                        value="{!! old('cost',$product->cost) !!}" class="form-control cost"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('cost'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('cost') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //Cost --}}
-@endif
+
+
 
 @if (gp247_config_admin('product_price') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
                         {{-- Price --}}
@@ -448,338 +540,15 @@
                         {{-- //Price --}}
 @endif
 
-@if ((gp247_config_admin('product_tax') && gp247_config_admin('product_tax') != 'none') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- Tax --}}
-                        <div class="form-group row {{ $errors->has('tax_id') ? ' text-red' : '' }}">
-                            <label for="tax_id" class="col-sm-2 col-form-label">{{ gp247_language_render('product.tax') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <select class="form-control tax_id select2"
-                                    name="tax_id">
-                                    @foreach ($taxs as $k => $v)
-                                    <option value="{{ $k }}"
-                                        {{ (old('tax_id') ==$k || (!old() && $product->tax_id ==$k) ) ? 'selected':'' }}>
-                                        {{ $v }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="input-group-append">
-                                    <a target=_new href="{{ gp247_route_admin('admin_tax.index') }}" class="btn  btn-flat" title="New">
-                                        <i class="fa fa-plus" title="{{ gp247_language_render('action.add') }}"></i>
-                                     </a>
-                                </div>
-                                </div>
-                                @if ($errors->has('tax_id'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('tax_id') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //Tax --}}
-@endif
 
 
-@if (gp247_config_admin('product_promotion') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- promotion checkbox --}}
-                        <div class="form-group row">
-                            <label for="promotion_use" class="col-sm-2 col-form-label">{{ gp247_language_render('admin.product.promotion_use') }}</label>
-                            <div class="col-sm-1 form-group">
-                                <input class="checkbox" type="checkbox" name="promotion_use" id="promotion_use" {{ (old('promotion_use', $product->promotionPrice ? 'on' : '')  ==='on')?'checked':'' }}>
-                            </div>
-                            
-                        {{-- price promotion --}}
-                        <div class="form-group row kind promotion-section col-sm-9" style="{{ (old('promotion_use', $product->promotionPrice ? 'on' : '') ==='on')?'':'display: none;' }}">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                            </div>
-                                            <input type="number" min="0" step="0.01" id="price_promotion" name="price_promotion" 
-                                                value="{!! old('price_promotion',$product->promotionPrice->price_promotion ?? '') !!}" class="form-control input-sm price" 
-                                                placeholder="{{ gp247_language_render('product.price_promotion') }}" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-calendar fa-fw"></i></span>
-                                            </div>
-                                            <input type="text" id="price_promotion_start" name="price_promotion_start"
-                                                value="{!!old('price_promotion_start', gp247_datetime_to_date($product->promotionPrice->date_start ?? null))!!}" class="form-control input-sm price_promotion_start date_time" 
-                                                data-date-format="yyyy-mm-dd" placeholder="{{ gp247_language_render('product.price_promotion_start') }}" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-calendar fa-fw"></i></span>
-                                            </div>
-                                            <input type="text" id="price_promotion_end" name="price_promotion_end"
-                                                value="{!!old('price_promotion_end', gp247_datetime_to_date($product->promotionPrice->date_end ?? null))!!}" class="form-control input-sm price_promotion_end date_time"
-                                                data-date-format="yyyy-mm-dd" placeholder="{{ gp247_language_render('product.price_promotion_end') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            @if ($errors->has('price_promotion'))
-                            <span class="form-text">
-                                <i class="fa fa-info-circle"></i> {{ $errors->first('price_promotion') }}
-                            </span>
-                            @endif
-                    </div>
-                    {{-- //price promotion --}}
-                        </div>
-
-@endif
 
 
-@if (gp247_config_admin('product_stock') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- Stock --}}
-                        <div class="form-group row {{ $errors->has('stock') ? ' text-red' : '' }}">
-                            <label for="stock" class="col-sm-2 col-form-label">{{ gp247_language_render('product.stock') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" style="width: 100px;" id="stock" name="stock"
-                                        value="{!! old('stock',$product->stock) !!}" class="form-control stock"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('stock'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('stock') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //Stock --}}
-@endif
-
-@if (gp247_config_admin('product_weight') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- weight --}}
-                        <div class="form-group row {{ $errors->has('weight_class') ? ' text-red' : '' }}">
-                            <label for="weight_class" class="col-sm-2 col-form-label"><u>{{ gp247_language_render('admin.product.weight_class') }}</u></label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <select class="form-control weight_class select2"
-                                    name="weight_class">
-                                    <option value="">{{ gp247_language_render('admin.product.select_weight') }}<option>
-                                    @foreach ($listWeight as $v)
-                                    <option value="{{ $v }}"
-                                        {{ (old('weight_class') == $v || (!old() && $product->weight_class ==$v) ) ? 'selected':'' }}>
-                                        {{ $v }}</option>
-                                    @endforeach
-                                </select>
-                                </div>
-                                @if ($errors->has('weight_class'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('weight_class') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
 
 
-                        <div class="form-group row {{ $errors->has('weight') ? ' text-red' : '' }}">
-                            <label for="weight" class="col-sm-2 col-form-label">{{ gp247_language_render('product.weight') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" min="0" step="0.01" style="width: 100px;" id="weight" name="weight"
-                                        value="{!! old('weight',$product->weight) !!}" class="form-control weight"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('weight'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('weight') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- //weight --}}
-@endif
 
 
-@if (gp247_config_admin('product_length') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- length --}}
-                        <div class="form-group row {{ $errors->has('length_class') ? ' text-red' : '' }}">
-                            <label for="length_class" class="col-sm-2 col-form-label"><u>{{ gp247_language_render('admin.product.length_class') }}</u></label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <select class="form-control length_class select2"
-                                    name="length_class">
-                                    <option value="">{{ gp247_language_render('admin.product.select_length') }}<option>
-                                    @foreach ($listLength as  $v)
-                                    <option value="{{ $v }}"
-                                        {{ (old('length_class') == $v || (!old() && $product->length_class ==$v) ) ? 'selected':'' }}>
-                                        {{ $v }}</option>
-                                    @endforeach
-                                </select>
-                                </div>
-                                @if ($errors->has('length_class'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('length_class') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
 
-
-                        <div class="form-group row {{ $errors->has('length') ? ' text-red' : '' }}">
-                            <label for="length" class="col-sm-2 col-form-label">{{ gp247_language_render('product.length') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" min="0" step="0.01" style="width: 100px;" id="length" name="length"
-                                        value="{!! old('length',$product->length) !!}" class="form-control length"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('length'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('length') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row {{ $errors->has('height') ? ' text-red' : '' }}">
-                            <label for="height" class="col-sm-2 col-form-label">{{ gp247_language_render('product.height') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" min="0" step="0.01" style="width: 100px;" id="height" name="height"
-                                        value="{!! old('height',$product->height) !!}" class="form-control height"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('height'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('height') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row {{ $errors->has('width') ? ' text-red' : '' }}">
-                            <label for="width" class="col-sm-2 col-form-label">{{ gp247_language_render('product.width') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" min="0" step="0.01" style="width: 100px;" id="width" name="width"
-                                        value="{!! old('width',$product->width) !!}" class="form-control width"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('width'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('width') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- //length --}}
-@endif
-
-
-@if (gp247_config_admin('product_tag') && ($product->kind == GP247_PRODUCT_SINGLE))
-                        <div class="form-group row kind kind0 kind1  {{ $errors->has('tag') ? ' text-red' : '' }}">
-                            <label for="tag" class="col-sm-2 col-form-label">{{ gp247_language_render('product.tag') }}</label>
-                            <div class="col-sm-8">
-                                <div class="icheck-primary d-inline">
-                                    <input type="radio" id="radioPrimary" name="tag" value="" {{ (old('tag', '') == '')?'checked':'' }}>
-                                    <label for="radioPrimary">
-                                        None
-                                    </label>
-                                </div>
-                                @foreach ( $tags as $tag)
-                                <div class="icheck-primary d-inline">
-                                    <input type="radio" id="radioPrimary{{ $tag }}" name="tag" value="{{ $tag }}"  {{ (old('tag', $product->tag) == $tag)?'checked':'' }}>
-                                    <label for="radioPrimary{{ $tag }}">
-                                        {{ $tag }}
-                                    </label>
-                                </div>
-                                @endforeach
-                                <div class="icheck-primary d-inline">
-                                <label>
-                                    <a target=_new href="{{ gp247_route_admin('admin_product_tag.index') }}" title="New">
-                                        <i class="fa fa-plus" title="{{ gp247_language_render('action.add') }}"></i>
-                                    </a>
-                                </label>
-                                </div>
-                                @if ($errors->has('tag'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('tag') }}
-                                </span>
-                                @endif
-
-                            </div>
-                        </div>
-@endif
-
-@if (gp247_config_admin('product_available') && ($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                        {{-- Date vailalable --}}
-                        <div
-                            class="form-group row kind kind0 kind1  {{ $errors->has('date_available') ? ' text-red' : '' }}">
-                            <label for="date_available"
-                                class="col-sm-2 col-form-label">{{ gp247_language_render('product.date_available') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa fa-calendar fa-fw"></i></span>
-                                    </div>
-                                    <input type="text" style="width: 100px;" id="date_available" name="date_available"
-                                        value="{!!old('date_available',$product->date_available)!!}"
-                                        class="form-control date_available date_time" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" />
-                                </div>
-                                @if ($errors->has('date_available'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('date_available') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //Date vailalable --}}
-@endif
-
-
-@if (($product->kind == GP247_PRODUCT_SINGLE || $product->kind == GP247_PRODUCT_BUILD))
-                            
-                        {{-- minimum --}}
-                        <div class="form-group row kind kind0 kind1  {{ $errors->has('minimum') ? ' text-red' : '' }}">
-                            <label for="minimum" class="col-sm-2 col-form-label">{{ gp247_language_render('product.minimum') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" style="width: 100px;" id="minimum" name="minimum"
-                                        value="{!! old('minimum',$product['minimum']) !!}" class="form-control minimum"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('minimum'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('minimum') }}
-                                </span>
-                                @else
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ gp247_language_render('product.minimum_help') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                        {{-- //minimum --}}
-@endif
 
                         {{-- Sort --}}
                         <div class="form-group row  {{ $errors->has('sort') ? ' text-red' : '' }}">
@@ -1172,5 +941,63 @@ $(document).ready(function() {
 
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Add item button
+    document.querySelectorAll('.btn-add-item').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const list = btn.closest('.form-group').querySelector('.what-items-list');
+            const inputName = list.querySelector('input')?.name || 'what_items[]';
+            const div = document.createElement('div');
+            div.classList.add('input-group', 'mb-2');
+            div.innerHTML = `
+                <input type="text" name="${inputName}" class="form-control" placeholder="Item text">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger btn-remove-item">×</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    });
+
+    // Remove item
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-remove-item')) {
+            const inputGroup = e.target.closest('.input-group');
+            inputGroup?.remove();
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-add-faq').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const container = btn.closest('.form-group').querySelector('.faq-items-list');
+            const index = container.children.length;
+            const lang = btn.closest('.form-group').querySelector('input')?.name?.match(/\[([a-z]{2})\]/)?.[1] || 'en';
+
+            const html = `
+                <div class="faq-entry input-group mb-2">
+                    <input type="text" name="descriptions[${lang}][faq][${index}][question]" class="form-control mr-1" placeholder="Question">
+                    <input type="text" name="descriptions[${lang}][faq][${index}][answer]" class="form-control mr-1" placeholder="Answer">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-remove-faq">×</button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-remove-faq')) {
+            e.target.closest('.faq-entry').remove();
+        }
+    });
+});
+</script>
+
 
 @endpush

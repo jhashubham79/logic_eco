@@ -127,8 +127,8 @@
         <div class="gp247-overlay"><i class="fa fa-spinner fa-pulse fa-5x fa-fw "></i></div>
     </div>
 
-    <script src="url('public/GP247/Templates/Default/js/core.min.js')}}"></script>
-    <script src="{{ url('public/GP247/Templates/Default/js/script.js')}}"></script>
+    <script src="url('GP247/Templates/Default/js/core.min.js')}}"></script>
+    <script src="{{ url('GP247/Templates/Default/js/script.js')}}"></script>
     
     <!-- js default for item gp247 -->
     @include($GP247TemplatePath.'.common.js')

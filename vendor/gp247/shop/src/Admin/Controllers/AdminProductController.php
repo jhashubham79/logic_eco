@@ -286,7 +286,9 @@ class AdminProductController extends RootAdminController
             'product_kind'         => GP247_PRODUCT_SINGLE,
             'customFields'         => (new AdminCustomField)->getCustomField($type = 'shop_product'),
         ];
-
+          
+          
+          
         return view('gp247-shop-admin::screen.product_add')
             ->with($data);
     }
@@ -421,7 +423,7 @@ class AdminProductController extends RootAdminController
                     'descriptions.*.name'        => 'required|string|max:100',
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
-                    'descriptions.*.content'     => 'required|string',
+                   // 'descriptions.*.content'     => 'required|string',
                     'category'                   => 'required',
                     'sku'                        => 'required|product_sku_unique',
                     'alias'                      => 'required|string|max:120|product_alias_unique',
@@ -436,7 +438,7 @@ class AdminProductController extends RootAdminController
                 
                 $arrMsg = [
                     'descriptions.*.name.required'    => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.name')]),
-                    'descriptions.*.content.required' => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.content')]),
+                    //'descriptions.*.content.required' => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.content')]),
                     'category.required'               => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.category')]),
                     'sku.regex'                       => gp247_language_render('product.sku_validate'),
                     'sku.product_sku_unique'          => gp247_language_render('product.sku_unique'),
@@ -626,20 +628,79 @@ class AdminProductController extends RootAdminController
             gp247_custom_field_update($fields, $product->id, 'shop_product');
 
             //Insert description
-            $dataDes = [];
-            $languages = $this->languages;
-            foreach ($languages as $code => $value) {
-                $dataDes[] = gp247_clean([
-                    'product_id'  => $product->id,
-                    'lang'        => $code,
-                    'name'        => $descriptions[$code]['name'],
-                    'keyword'     => $descriptions[$code]['keyword'],
-                    'description' => $descriptions[$code]['description'],
-                    'content'     => $descriptions[$code]['content'] ?? '',
-                ], ['content'], true);
-            }
+            // Insert description
+$dataDes = [];
+$languages = $this->languages;
 
-            AdminProduct::insertDescriptionAdmin($dataDes);
+$usps = $data['usps']; 
+$frus = $data['frus']; // ['0' => ['name' => ..., 'image' => ..., 'content' => ...], ...]
+
+foreach ($languages as $code => $value) {
+    
+    
+    $row = [
+        'product_id'  => $product->id,
+        'lang'        => $code,
+        'name'        => $descriptions[$code]['name'],
+        'keyword'     => $descriptions[$code]['keyword'],
+        'description' => $descriptions[$code]['description'],
+        'content'     => $descriptions[$code]['content'] ?? '',
+         'what_heading'   => $descriptions[$code]['what_heading'] ?? null,
+        'what_subheading'=> $descriptions[$code]['what_subheading'] ?? null,
+       'what_items' => isset($descriptions[$code]['what_items']) ? json_encode(array_filter($descriptions[$code]['what_items'])) : null,
+       'faq' => json_encode(array_values(array_filter($descriptions[$code]['faq'] ?? [], function ($faq) {
+                return !empty($faq['question']) || !empty($faq['answer']);
+            }))),
+    ];
+    
+    if (request()->hasFile("descriptions.$code.what_image")) {
+        $file = request()->file("descriptions.$code.what_image");
+        $filename = time() . "_what_" . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/usp'), $filename);
+        $row["what_image"] = 'uploads/usp/' . $filename;
+    } else {
+        $row["what_image"] = null;
+    }
+          
+    // Loop over each USP
+    for ($i = 0; $i < 4; $i++) {
+        $row["usp_" . ($i + 1) . "_name"] = $usps[$i]['name'] ?? null;
+        $row["usp_" . ($i + 1) . "_content"] = $usps[$i]['content'] ?? null;
+
+        // Check if image was uploaded
+        if (request()->hasFile("usps.$i.image")) {
+            $file = request()->file("usps.$i.image");
+            $filename = time() . "_usp_" . ($i + 1) . "_" . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/usp'), $filename);
+            $row["usp_" . ($i + 1) . "_image"] = 'uploads/usp/' . $filename;
+        } else {
+            $row["usp_" . ($i + 1) . "_image"] = null;
+        }
+    }
+    
+    
+     // Loop over each Frustrated
+    for ($i = 0; $i < 4; $i++) {
+        $row["frus_" . ($i + 1) . "_name"] = $frus[$i]['name'] ?? null;
+        $row["frus_" . ($i + 1) . "_content"] = $frus[$i]['content'] ?? null;
+
+        // Check if image was uploaded
+        if (request()->hasFile("frus.$i.image")) {
+            $file = request()->file("frus.$i.image");
+            $filename = time() . "_frus_" . ($i + 1) . "_" . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/frus'), $filename);
+            $row["frus_" . ($i + 1) . "_image"] = 'uploads/frus/' . $filename;
+        } else {
+            $row["frus_" . ($i + 1) . "_image"] = null;
+        }
+    }
+
+    $dataDes[] = ($row);
+}
+
+// Save to DB
+AdminProduct::insertDescriptionAdmin($dataDes);
+
 
             //Insert sub mages
             if ($subImages && in_array($data['kind'], [GP247_PRODUCT_SINGLE, GP247_PRODUCT_BUILD])) {
@@ -757,7 +818,7 @@ class AdminProductController extends RootAdminController
                     'descriptions.*.name' => 'required|string|max:200',
                     'descriptions.*.keyword' => 'nullable|string|max:200',
                     'descriptions.*.description' => 'nullable|string|max:500',
-                    'descriptions.*.content' => 'required|string',
+                    //'descriptions.*.content' => 'required|string',
                     'category' => 'required',
                     'sku' => 'required|product_sku_unique:'.$id,
                     'alias' => 'required|string|max:120|product_alias_unique:'.$id,
@@ -771,7 +832,7 @@ class AdminProductController extends RootAdminController
 
                 $arrMsg = [
                     'descriptions.*.name.required'    => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.name')]),
-                    'descriptions.*.content.required' => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.content')]),
+                   // 'descriptions.*.content.required' => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.content')]),
                     'category.required'               => gp247_language_render('validation.required', ['attribute' => gp247_language_render('product.category')]),
                     'sku.regex'                       => gp247_language_render('product.sku_validate'),
                     'sku.product_sku_unique'          => gp247_language_render('product.sku_unique'),
@@ -903,19 +964,84 @@ class AdminProductController extends RootAdminController
                 $product->promotionPrice()->create($arrPromotion);
             }
 
-            $product->descriptions()->delete();
-            $dataDes = [];
-            foreach ($data['descriptions'] as $code => $row) {
-                $dataDes[] = gp247_clean([
-                    'product_id' => $id,
-                    'lang' => $code,
-                    'name' => $row['name'],
-                    'keyword' => $row['keyword'],
-                    'description' => $row['description'],
-                    'content' => $row['content'] ?? '',
-                ], ['content'], true);
+         $descriptions = $data['descriptions'];
+$usps         = $data['usps'];
+$frus         = $data['frus'];
+
+foreach ($descriptions as $code => $row) {
+    $entry = [
+        'product_id'  => $id,
+        'lang'        => $code,
+        'name'        => $row['name'],
+        'keyword'     => $row['keyword'],
+        'description' => $row['description'],
+        'content'     => $row['content'] ?? '',
+         'what_heading'   => $row['what_heading'] ?? null,
+        'what_subheading'=> $row['what_subheading'] ?? null,
+       'what_items' => isset($row['what_items']) ? json_encode(array_filter($row['what_items'])) : null,
+       'faq' => json_encode(array_values(array_filter($row['faq'] ?? [], function ($faq) {
+    return !empty($faq['question']) || !empty($faq['answer']);
+}))),
+
+    ];
+     if (request()->hasFile("descriptions.$code.what_image")) {
+        $file = request()->file("descriptions.$code.what_image");
+        $filename = time() . "_what_" . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/usp'), $filename);
+        $entry["what_image"] = 'uploads/usp/' . $filename;
+    } else {
+        $entry["what_image"] = $row['what_imageold'] ?? null;
+    }
+
+
+    // USP data only for default language
+    if ($code === 'en') {
+        for ($i = 1; $i <= 4; $i++) {
+            $entry["usp_{$i}_name"]    = $usps[$i]['name'] ?? null;
+            $entry["usp_{$i}_content"] = $usps[$i]['content'] ?? null;
+
+            $uploadedFile = request()->file("usps.$i.image");
+
+            if ($uploadedFile) {
+                $filename = time() . "_usp_" . $i . "_" . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+                $uploadedFile->move(public_path('uploads/usp'), $filename);
+                $entry["usp_{$i}_image"] = 'uploads/usp/' . $filename;
+            } else {
+                // If no new image uploaded, get previous saved one from DB (fallback to old image)
+                $oldImage = $usps[$i]['imageold'] ?? null;
+                $entry["usp_{$i}_image"] = !empty($oldImage) ? $oldImage : null;
             }
-            AdminProduct::insertDescriptionAdmin($dataDes);
+        }
+        
+        
+        //frusted
+        
+         for ($i = 1; $i <= 4; $i++) {
+            $entry["frus_{$i}_name"]    = $frus[$i]['name'] ?? null;
+            $entry["frus_{$i}_content"] = $frus[$i]['content'] ?? null;
+
+            $uploadedFile = request()->file("frus.$i.image");
+
+            if ($uploadedFile) {
+                $filename = time() . "_frus_" . $i . "_" . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+                $uploadedFile->move(public_path('uploads/frus'), $filename);
+                $entry["frus_{$i}_image"] = 'uploads/frus/' . $filename;
+            } else {
+                // If no new image uploaded, get previous saved one from DB (fallback to old image)
+                $oldImage = $frus[$i]['imageold'] ?? null;
+                $entry["frus_{$i}_image"] = !empty($oldImage) ? $oldImage : null;
+            }
+        }
+    }
+
+//dd( $entry);
+    // Use updateOrInsert to keep previous data
+    DB::table('gp247_shop_product_description')->updateOrInsert(
+        ['product_id' => $id, 'lang' => $code],
+        $entry
+    );
+}
+
 
             $product->categories()->detach();
             if (count($category)) {
