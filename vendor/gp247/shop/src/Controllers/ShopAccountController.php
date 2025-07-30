@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use GP247\Shop\Controllers\Auth\AuthTrait;
+use GP247\Shop\Admin\Models\AdminOrder;
+
 
 class ShopAccountController extends RootFrontController
 {
@@ -486,6 +488,68 @@ class ShopAccountController extends RootFrontController
         } else {
             $customer->update(['email_verified_at' => \Carbon\Carbon::now()]);
             return redirect(gp247_route_front('customer.index'))->with(['message' => gp247_language_render('customer.verify_email.verify_success')]);
+        }
+    }
+    
+    
+     public function invoice($id)
+    {
+        $orderId = $id ?? null;
+        $order = AdminOrder::getOrderAdmin($orderId);
+        if ($order) {
+            $data                    = array();
+            $data['name']            = $order['first_name'] . ' ' . $order['last_name'];
+            $data['address']         = $order['address1'] . ', ' . $order['address2'] . ', ' . $order['address3'].', '.$order['country'];
+            $data['phone']           = $order['phone'];
+            $data['email']           = $order['email'];
+            $data['comment']         = $order['comment'];
+            $data['payment_method']  = $order['payment_method'];
+            $data['shipping_method'] = $order['shipping_method'];
+            $data['created_at']      = $order['created_at'];
+            $data['currency']        = $order['currency'];
+            $data['exchange_rate']   = $order['exchange_rate'];
+            $data['subtotal']        = $order['subtotal'];
+            $data['tax']             = $order['tax'];
+            $data['shipping']        = $order['shipping'];
+            $data['discount']        = $order['discount'];
+            $data['total']           = $order['total'];
+            $data['received']        = $order['received'];
+            $data['balance']         = $order['balance'];
+            $data['other_fee']       = $order['other_fee'] ?? 0;
+            $data['comment']         = $order['comment'];
+            $data['country']         = $order['country'];
+            $data['id']              = $order->id;
+            $data['details'] = [];
+
+            $attributesGroup =  ShopAttributeGroup::pluck('name', 'id')->all();
+
+            if ($order->details) {
+                foreach ($order->details as $key => $detail) {
+                    $arrAtt = json_decode($detail->attribute, true);
+                    if ($arrAtt) {
+                        $htmlAtt = '';
+                        foreach ($arrAtt as $groupAtt => $att) {
+                            $htmlAtt .= $attributesGroup[$groupAtt] .':'.gp247_render_option_price($att, $order['currency'], $order['exchange_rate']);
+                        }
+                        $name = $detail->name.'('.strip_tags($htmlAtt).')';
+                    } else {
+                        $name = $detail->name;
+                    }
+                    $data['details'][] = [
+                        'no' => $key + 1, 
+                        'sku' => $detail->sku, 
+                        'name' => $name, 
+                        'qty' => $detail->qty, 
+                        'price' => $detail->price, 
+                        'total_price' => $detail->total_price,
+                    ];
+                }
+            }
+
+            return view('gp247-core::format.invoice')
+            ->with($data);
+        } else {
+            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
     }
 }

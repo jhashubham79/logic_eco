@@ -54,7 +54,7 @@ class ShopProductController extends RootFrontController
             ->setSort([$sortBy, $sortOrder])
             ->getData();
 
-            $subPath = 'screen.shop_product_list';
+            $subPath = 'screen.shop_product_alllist';
             $view = gp247_shop_process_view($this->GP247TemplatePath,$subPath);
             gp247_check_view($view);
         return view(

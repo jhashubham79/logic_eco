@@ -108,6 +108,92 @@
                                 @endif
                             </div>
                         </div>
+                         <hr>
+                        <h5 class="text-primary">Category Image</h5>
+                        @for ($i = 1; $i <= 2; $i++)
+                        <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Category {{ $i }} Image</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="images[{{ $i }}][image]"   class="form-control-file">
+                                         <input type="hidden" name="images[{{ $i }}][imageold]" value="{{ ($descriptions[$code]["cat_{$i}_image"] ?? '') }}" class="form-control-file">
+                                         
+                                        @if (!empty($descriptions[$code]["cat_{$i}_image"]))
+                                            <p class="mt-2">Current: <img src="{{ asset($descriptions[$code]["cat_{$i}_image"]) }}" alt="Cat Image {{ $i }}" height="60"></p>
+                                        @endif
+                                    </div>
+                                </div>
+                                 @endfor
+                                
+                                
+                                <hr>
+                                                       
+                                <h5 class="text-primary">Category usp</h5>
+                                
+                                @for ($i = 1; $i <= 4; $i++)
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">USP {{ $i }} Name</label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                            name="usps[{{ $i }}][name]"
+                                            value="{{ old("descriptions.$code.usp_{$i}_name", ($descriptions[$code]["usp_{$i}_name"] ?? '')) }}"
+                                            class="form-control" placeholder="USP {{ $i }} name">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">USP {{ $i }} Content</label>
+                                    <div class="col-sm-8">
+                                        <textarea name="usps[{{ $i }}][content]" class="form-control"
+                                            placeholder="USP {{ $i }} content">{{ old("descriptions.$code.usp_{$i}_content", ($descriptions[$code]["usp_{$i}_content"] ?? '')) }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">USP {{ $i }} Image</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="usps[{{ $i }}][image]"   class="form-control-file">
+                                         <input type="hidden" name="usps[{{ $i }}][imageold]" value="{{ ($descriptions[$code]["usp_{$i}_image"] ?? '') }}" class="form-control-file">
+                                         
+                                        @if (!empty($descriptions[$code]["usp_{$i}_image"]))
+                                            <p class="mt-2">Current: <img src="{{ asset($descriptions[$code]["usp_{$i}_image"]) }}" alt="USP Image {{ $i }}" height="60"></p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @endfor
+                                
+                                
+                                <hr>
+                        
+                        
+                                @php
+                            $faqItems = $descriptions[$code]['faq'] ?? []; // fallback to empty array if not set
+                            if (is_string($faqItems)) {
+                                $faqItems = json_decode($faqItems, true);
+                            }
+                        @endphp
+                        
+                        
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">FAQs</label>
+                            <div class="col-sm-8 faq-items-list">
+                                @foreach ($faqItems as $index => $faq)
+                                    <div class="faq-entry input-group mb-2">
+                                        <input type="text" name="descriptions[{{ $code }}][faq][{{ $index }}][question]" class="form-control mr-1" placeholder="Question" value="{{ $faq['question'] ?? '' }}">
+                                        <input type="text" name="descriptions[{{ $code }}][faq][{{ $index }}][answer]" class="form-control mr-1" placeholder="Answer" value="{{ $faq['answer'] ?? '' }}">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-danger btn-remove-faq">×</button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="col-sm-8 offset-sm-2 mt-2">
+                                <button type="button" class="btn btn-sm btn-primary btn-add-faq">Add FAQ</button>
+                            </div>
+                        </div>
+                        
+                        
                             </div>
                         </div>
                         @endforeach
@@ -199,7 +285,7 @@
                             </div>
                         </div>                        
 
-                        <div class="form-group row  {{ $errors->has('image') ? ' text-red' : '' }}">
+                        <div  class="form-group row  {{ $errors->has('image') ? ' text-red' : '' }} d-none">
                             <label for="image" class="col-sm-2 col-form-label">{{ gp247_language_render('admin.category.image') }}</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
@@ -305,4 +391,33 @@
 @endpush
 
 @push('scripts')
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-add-faq').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const container = btn.closest('.form-group').querySelector('.faq-items-list');
+            const index = container.children.length;
+            const lang = btn.closest('.form-group').querySelector('input')?.name?.match(/\[([a-z]{2})\]/)?.[1] || 'en';
+
+            const html = `
+                <div class="faq-entry input-group mb-2">
+                    <input type="text" name="descriptions[${lang}][faq][${index}][question]" class="form-control mr-1" placeholder="Question">
+                    <input type="text" name="descriptions[${lang}][faq][${index}][answer]" class="form-control mr-1" placeholder="Answer">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-remove-faq">×</button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-remove-faq')) {
+            e.target.closest('.faq-entry').remove();
+        }
+    });
+});
+</script>
 @endpush

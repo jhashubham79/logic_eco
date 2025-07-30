@@ -177,8 +177,9 @@ $layout_page = shop_profile
                 @endforeach
                 <tr class="data-balance"><td>{{ gp247_language_render('order.totals.balance') }}:</td><td style="text-align:right">{{ gp247_currency_format($order->balance) }}</td></tr>
             </table>
+            <a href="{{url('customer/invoice/' . $order->id)}}">Invoice</a>
           </div>
-
+                      
         </div>
       </div>
 

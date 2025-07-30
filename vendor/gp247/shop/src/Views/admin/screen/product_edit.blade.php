@@ -326,7 +326,7 @@
                             }
                         }
                         @endphp
-
+                       
                         <div class="form-group row {{ $errors->has('category') ? ' text-red' : '' }}">
                             <label for="category"
                                 class="col-sm-2 col-form-label">{{ gp247_language_render('admin.product.select_category') }}</label>
@@ -705,6 +705,55 @@
                         {{-- //end List product build --}}
                         @endif
 @endif
+
+
+@php
+    use Illuminate\Support\Facades\DB;
+
+    $relatedProductIds = DB::table('related_product')
+        ->where('product_id', $product->id)
+        ->orWhere('related_product_id', $product->id)
+        ->get()
+        ->flatMap(function ($item) use ($product) {
+            return collect([$item->product_id, $item->related_product_id])
+                ->reject(fn($id) => $id == $product->id);
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+@endphp
+
+<div class="form-group row {{ $errors->has('related_products') ? ' text-red' : '' }}">
+    <label for="related_products" class="col-sm-2 col-form-label">Related Product</label>
+    <div class="col-sm-8">
+        <div class="input-group">
+            <select class="form-control select2" multiple="multiple"
+                data-placeholder="Select Product"
+                name="related_products[]">
+                <option value=""></option>
+                @foreach ($dataProduct as $prod)
+                    @if ($prod->id != $product->id)
+                        <option value="{{ $prod->id }}"
+                            {{ in_array($prod->id, $relatedProductIds) ? 'selected' : '' }}>
+                            {{ $prod->name }}
+                        </option>
+                    @endif
+                @endforeach
+            </select>
+            <div class="input-group-append">
+                <a target="_blank" href="{{ gp247_route_admin('admin_product.index') }}" class="btn btn-flat" title="New">
+                    <i class="fa fa-plus" title="{{ gp247_language_render('action.add') }}"></i>
+                </a>
+            </div>
+        </div>
+        @if ($errors->has('related_products'))
+            <span class="form-text">
+                <i class="fa fa-info-circle"></i> {{ $errors->first('related_products') }}
+            </span>
+        @endif
+    </div>
+</div>
+
 
 
 @if (gp247_config_admin('product_attribute') && ($product->kind == GP247_PRODUCT_SINGLE))

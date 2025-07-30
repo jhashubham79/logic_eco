@@ -34,7 +34,7 @@ $home = DB::table('gp247_front_page_description')
   <!-- Bottom Video -->
   <div class="video-wrapper">
     <video autoplay muted loop>
-      <source src="{{url('public/images/1088330669-preview.mp4')}}" type="video/mp4">
+      <source src="{{url('images/1088330669-preview.mp4')}}" type="video/mp4">
       Your browser does not support the video tag.
     </video>
   </div>
@@ -58,7 +58,7 @@ $home = DB::table('gp247_front_page_description')
             <div class="col-md-4 col-sm-12">
               <div class="step-item stepBoxWrap">
               <div class="stepBox">
-                <img src="{{url('public/images/3 (2).png')}}" class="step-icon" alt="Step 1">
+                <img src="{{url('images/3 (2).png')}}" class="step-icon" alt="Step 1">
               <div class="steptxt">
                 <p  class="steps">STEP 1</p>
                 <h5>Choose Your Fix</h5>
@@ -96,7 +96,7 @@ $home = DB::table('gp247_front_page_description')
              <div class="col-md-4 col-sm-12">
               <div class="step-item stepBoxWrap">                
               <div class="stepBox">
-                <img src="{{url('public/images/3 (1).png')}}" class="step-icon" alt="Step 1">
+                <img src="{{url('images/3 (1).png')}}" class="step-icon" alt="Step 1">
                 <div class="steptxt">
                   <p  class="steps">STEP 3</p>
                   <h5>Consider It Done</h5>

@@ -33,14 +33,11 @@ $layout_page = shop_product_detail
 <h1>
     <span class="text-primary">{{ $firstWord }}</span>{{ $rest }}
 </h1>
+  
 
-
-            <!--<img src="/images/Google logo.svg" alt="">-->
-        
-       
          
         <!-- Right floating image -->
-        <img src="{{url($product->images[0]->image)}}" alt="Target"
+        <img src="{{url($product->images[0]->image ?? '')}}" alt="Target"
              class="floating-icon-right-product">
 
              <div class="product-section-btn">
@@ -56,7 +53,7 @@ $layout_page = shop_product_detail
                 {{-- Button add to cart --}}
                 @if ($product->kind != GP247_PRODUCT_GROUP && $product->allowSale() && gp247_config('product_use_button_add_to_cart'))
                
-                      <!--<input class="form-input" name="qty" type="number" data-zeros="true" value="1" min="1" max="100">-->
+                      <input class="form-input" name="qty" type="hidden" data-zeros="true" value="1" min="1" max="100">
                     
                       <button class="btn-products" type="submit" id="gp247-button-process">{{ gp247_language_render('action.add_to_cart') }}</button>
                     
@@ -125,7 +122,7 @@ $layout_page = shop_product_detail
 
       <div class="col-lg-4 col-12 text-md-center">
         <div class="whatyougot-img">
-          <img src="{{url($product->what_image)}}" class="img-fluid" alt="">
+          <img src="{{url($product->what_image ?? '')}}" class="img-fluid" alt="">
         </div>
       </div>
 
@@ -193,69 +190,114 @@ $layout_page = shop_product_detail
 </section>
 
 
-
-<!-- price-section  -->
-<section class=" price-section-product py-5">
+<!-- Related Product Section -->
+<section class="price-section-product py-5">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col--10 col-sm-12">
+      <div class="col-12">
         <div class="price-section text-center"> 
-             <h2>Enhance Your Solution</h2>
-             <p >
-               Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.
-              </p>
+          <h2>Enhance Your Solution</h2>
+          <p>
+            Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.
+          </p>
         </div>
-        <div class="col-md-10 col-sm-12 mx-auto">
-          <div>
-              <div class="price-section-cards">
-      <!-- Option Cards -->
-      <div class=" form-check form-product border-bottom">
-        <div>
-          <input class="form-check-input " type="checkbox" value="" id="option1">
-          <label class="form-check-label " for="option1">Advanced GA4 Reporting setup</label>
-          <p>Get custom dashboard and reports tailored to your KPIs.</p>
-        </div>
-        <span>$299</span>
+
+     @php
+    use Illuminate\Support\Facades\DB;
+
+    // Main product price
+    $mainProductId = $product->id;
+    $mainProductPrice = $product->price;
+
+    // Get related product IDs excluding the current product
+    $relatedIds = DB::table('related_product')
+        ->where('product_id', $mainProductId)
+        ->orWhere('related_product_id', $mainProductId)
+        ->get()
+        ->flatMap(function ($item) use ($mainProductId) {
+            return collect([$item->product_id, $item->related_product_id])
+                ->reject(fn($id) => $id == $mainProductId);
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+
+    // Get related products with English description
+    $relatedProducts = DB::table('gp247_shop_product as p')
+        ->join('gp247_shop_product_description as d', 'p.id', '=', 'd.product_id')
+        ->whereIn('p.id', $relatedIds)
+        ->where('d.lang', 'en') // Filter for English language
+        ->select('p.id', 'p.price', 'd.name', 'd.description')
+        ->get();
+@endphp
+
+@if($relatedProducts->count())
+<form id="multi-add-to-cart" action="{{ gp247_route_front('cart.multi_add') }}" method="POST">
+  @csrf
+
+  {{-- Main product (always included) --}}
+  <input type="hidden" name="products[]" value="{{ $mainProductId }}">
+  
+      <input type="hidden"
+             name="qty[{{ $mainProductId }}]"
+             value="1"
+             min="1"
+             class="form-control form-control-sm qty-input"
+             style="width: 80px;"
+             data-id="{{ $mainProductId }}"
+             data-price="{{ $mainProductPrice }}"
+             id="main-product-qty">
+    </div>
+ 
+
+  {{-- Related products --}}
+  @foreach ($relatedProducts as $relProd)
+    <div class="form-check form-product border-bottom py-3 d-flex justify-content-between align-items-start">
+      <div>
+        <input 
+            class="form-check-input product-checkbox" 
+            type="checkbox" 
+            name="products[]" 
+            value="{{ $relProd->id }}" 
+            data-price="{{ $relProd->price }}"
+            id="product_{{ $relProd->id }}">
+        <label class="form-check-label fw-bold" for="product_{{ $relProd->id }}">
+          {{ $relProd->name }}
+        </label>
+        <p class="mb-1">{{ $relProd->description ?? 'No description available' }}</p>
       </div>
 
-      <div class=" form-check form-product border-bottom">
-        <div>
-          <input class="form-check-input " type="checkbox" value="" id="option1">
-          <label class="form-check-label " for="option1">Advanced GA4 Reporting setup</label>
-          <p>Get custom dashboard and reports tailored to your KPIs.</p>
-        </div>
-        <span>$299</span>
-      </div>
-
-      <div class=" form-check form-product border-bottom">
-        <div>
-          <input class="form-check-input " type="checkbox" value="" id="option1">
-          <label class="form-check-label " for="option1">Advanced GA4 Reporting setup</label>
-          <p>Get custom dashboard and reports tailored to your KPIs.</p>
-        </div>
-        <span>$299</span>
-      </div>
-
-      <!-- Total Price Row -->
-      <div class=" product-price-sec  mt-4  ">
-        <div class="price-badge-product">
-          <span class="badge  d-none d-md-flex">Saving 20%</span>
-        <div class="product-total">Total : <span class="total price">$299</span></div>
-        </div>
-        
-        <button class="product-price-btn">Buy GTM <span class="fix">Fix</span></button>
+      <div class="text-end">
+        <span class="d-block text-muted mb-2">${{ number_format($relProd->price, 2) }}</span>
+        <input type="number" 
+               name="qty[{{ $relProd->id }}]" 
+               value="1" 
+               min="1" 
+               class="form-control form-control-sm qty-input d-none" 
+               style="width: 80px;" 
+               data-id="{{ $relProd->id }}"
+               disabled>
       </div>
     </div>
-          </div>
-        </div>
+  @endforeach
+
+  <div class="product-price-sec mt-4 text-center">
+    <div class="price-badge-product mb-3">
+      <!--<span class="badge bg-success d-none d-md-inline-block">Saving 20%</span>-->
+      <div class="product-total fs-5">Total: <span class="total price">$0.00</span></div>
+    </div>
+    <button type="submit" class="product-price-btn btn btn-warning px-5">
+      Buy  
+    </button>
+  </div>
+</form>
+@endif
+
+
       </div>
     </div>
-    
   </div>
 </section>
-
-
-
 
 
 
@@ -383,7 +425,7 @@ $layout_page = shop_product_detail
 
     @php
       $faqItems = [];
-      $rawFaq = $product->faq ?? ($descriptions[$code]['faq'] ?? null);
+      $rawFaq = $product->faq ??  null;
 
       if (is_string($rawFaq)) {
           $faqItems = json_decode($rawFaq, true) ?? [];
@@ -438,5 +480,58 @@ $layout_page = shop_product_detail
 @endpush
 
 @push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    const totalDisplay = document.querySelector('.total.price');
+
+    function calculateTotal() {
+      let total = 0;
+
+      // Always include main product
+      const mainQty = document.querySelector('#main-product-qty');
+      const mainPrice = parseFloat(mainQty.dataset.price);
+      total += mainPrice * parseInt(mainQty.value || 1);
+
+      // Include related products if checked
+      checkboxes.forEach(cb => {
+        const id = cb.value;
+        const price = parseFloat(cb.dataset.price);
+        const qtyInput = document.querySelector(`.qty-input[data-id="${id}"]`);
+        const qty = (cb.checked && qtyInput && !qtyInput.disabled)
+            ? parseInt(qtyInput.value || 1)
+            : 0;
+
+        if (cb.checked) {
+          total += price * qty;
+        }
+      });
+
+      totalDisplay.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Toggle input enable/disable on checkbox change
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', function () {
+        const qtyInput = document.querySelector(`.qty-input[data-id="${cb.value}"]`);
+        if (qtyInput) {
+          qtyInput.disabled = !cb.checked;
+        }
+        calculateTotal();
+      });
+    });
+
+    // Recalculate on quantity input change
+    const qtyInputs = document.querySelectorAll('.qty-input');
+    qtyInputs.forEach(input => {
+      input.addEventListener('input', calculateTotal);
+    });
+
+    // Initial run
+    calculateTotal();
+  });
+</script>
+
+
 @endpush
 

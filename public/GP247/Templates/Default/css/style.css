@@ -626,7 +626,7 @@ a.dropdown-item {
 }
 
 .recommendation-form button {
-  background-image: url(/public/images/image\ 10.png);
+  background-image: url(/images/image\ 10.png);
   /* Replace with your image URL */
   background-size: cover;
   background-position: center;
@@ -778,7 +778,7 @@ a.dropdown-item {
 .section-ready {
   text-align: center;
   position: relative;
-  background-image: url(/public/images/Frame\ 36382.webp);
+  background-image: url(/images/Frame\ 36382.webp);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -874,14 +874,14 @@ a.dropdown-item {
 
 
 .faqsList .accordion-button::after {
-  background-image: url(/public/images/Button.png);
+  background-image: url(/images/Button.png);
   background-size: 35px;
   width: 35px;
   height: 34px;
 }
 
 .faqsList .accordion-button.collapsed::after {
-  background-image: url(/public/images/rightArrow.webp);
+  background-image: url(/images/rightArrow.webp);
 }
 
 .faqsList .accordion-button:not(.collapsed)::after {

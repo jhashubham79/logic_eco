@@ -21,7 +21,7 @@ use GP247\Core\Models\AdminStore;
 use GP247\Shop\Admin\Models\AdminCategory;
 use Illuminate\Support\Facades\Validator;
 use DB;
-
+use GP247\Shop\Models\ShopProduct;
 class AdminProductController extends RootAdminController
 {
     public $languages;
@@ -762,7 +762,13 @@ AdminProduct::insertDescriptionAdmin($dataDes);
         // html select attribute
         $htmlProductAtrribute = '<tr><td><br><input type="text" name="attribute[attribute_group][name][]" value="attribute_value" class="form-control rounded-0 input-sm" placeholder="' . gp247_language_render('admin.product.add_attribute_place') . '" /></td><td><br><input type="number" step="0.01" name="attribute[attribute_group][add_price][]" value="add_price_value" class="form-control rounded-0 input-sm" placeholder="' . gp247_language_render('admin.product.add_price_place') . '"></td><td><br><span title="Remove" class="btn btn-flat btn-sm btn-danger removeAttribute"><i class="fa fa-times"></i></span></td></tr>';
         //end select attribute
-
+         
+         
+         $dataProduct =   (new ShopProduct)
+            
+            
+            
+            ->getData();
 
         $data = [
             'title'                => gp247_language_render('admin.product.edit'),
@@ -784,6 +790,7 @@ AdminProduct::insertDescriptionAdmin($dataDes);
             'htmlProductAtrribute' => $htmlProductAtrribute,
             'listWeight'           => $this->listWeight,
             'listLength'           => $this->listLength,
+            'dataProduct'     => $dataProduct,
 
         ];
 
@@ -805,6 +812,7 @@ AdminProduct::insertDescriptionAdmin($dataDes);
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
         $data = request()->all();
+       
         $langFirst = array_key_first(gp247_language_all()->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['name'];
         $data['alias'] = gp247_word_format_url($data['alias']);
@@ -1041,6 +1049,36 @@ foreach ($descriptions as $code => $row) {
         $entry
     );
 }
+
+
+ 
+ 
+   $relatedProducts = $data['related_products'];
+//dd($data,$id,$relatedProducts);
+    // Remove existing related records (both directions)
+    DB::table('related_product')
+        ->where('product_id', $id)
+        ->orWhere('related_product_id', $id)
+        ->delete();
+
+    // Insert new relationships in both directions
+    foreach ($relatedProducts as $relatedId) {
+        if ($relatedId == $id) {
+            continue; // prevent self-relation
+        }
+
+        // Insert (product → related)
+        DB::table('related_product')->insertOrIgnore([
+            'product_id' => $id,
+            'related_product_id' => $relatedId
+        ]);
+
+        // Insert (related → product)
+        DB::table('related_product')->insertOrIgnore([
+            'product_id' => $relatedId,
+            'related_product_id' => $id
+        ]);
+    }
 
 
             $product->categories()->detach();

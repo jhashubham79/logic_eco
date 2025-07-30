@@ -4,7 +4,7 @@
     <div class="row g-4">
       <!-- Column 1: Logo + Address -->
       <div class="col-lg-3 col-12 footer-info">
-        <img src="images/image 7.png" alt="Logo" class="footer-logo mb-4">
+        <img src="{{url('images/image 7.png')}}" alt="Logo" class="footer-logo mb-4">
         <p class="mb-1 ">Jl. Pondok Leungsir Street No </br> 491 Village Park</p>
        
         <!-- <p class="mb-0"><a href="mailto:info@winvale.com">info@winvale.com</a></p>
@@ -72,49 +72,8 @@
 
     
 </body>
-  <script src=" {{ url('public/GP247/Templates/Default/js/bootstrap.bundle.min.js')}}"></script>
+  
  
-
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!-- Owl Carousel -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-
-<script>
-  $(document).ready(function () {
-    var owl = $('.video-3d-carousel');
-    owl.owlCarousel({
-      center: true,
-      items: 5,
-      loop: true,
-      margin: 20,
-      autoplay: false,
-    });
-
-    // Apply 3D transform on carousel change
-    function apply3DEffect() {
-      $('.video-3d-carousel .owl-item').each(function (i, el) {
-        var $el = $(el);
-        $el.css('transform', 'scale(0.8) rotateY(20deg)');
-        $el.css('z-index', 1);
-      });
-
-      var $center = $('.video-3d-carousel .owl-item.center');
-      $center.css('transform', 'scale(1.1) rotateY(0deg)');
-      $center.css('z-index', 10);
-    }
-
-    owl.on('initialized.owl.carousel changed.owl.carousel refreshed.owl.carousel', function () {
-      setTimeout(apply3DEffect, 50); // Delay ensures DOM update
-    });
-  });
-</script>
-
-
 
 
 

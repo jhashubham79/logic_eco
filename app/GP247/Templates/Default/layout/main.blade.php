@@ -3,37 +3,49 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="author" content="{{ config('app.name')}}">
+
+    <meta name="author" content="{{ config('app.name') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="canonical" href="{{ request()->url() }}" />
+
+    <title>{{ env('APP_NAME') }}</title>
     <meta name="description" content="{{ $description ?? gp247_store_info('description') }}">
     <meta name="keywords" content="{{ $keyword ?? gp247_store_info('keyword') }}">
-    <title>{{$title ?? env('APP_NAME')}}</title>
-    <link rel="icon" href="{{ gp247_file(gp247_store_info('icon','GP247/Core/logo/icon.png')) }}" type="image/png" sizes="16x16">
-    <meta property="og:image" content="{{ !empty($og_image)?gp247_file($og_image):gp247_file(gp247_store_info('og_image', 'GP247/Core/images/org.jpg')) }}" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ gp247_file(gp247_store_info('icon', 'GP247/Core/logo/icon.png')) }}" type="image/png" sizes="16x16">
+
+    <!-- Open Graph / Facebook Meta -->
+    <meta property="og:title" content="{{ $title ?? gp247_store_info('title') }}" />
+    <meta property="og:description" content="{{ $description ?? gp247_store_info('description') }}" />
+    <meta property="og:image" content="{{ !empty($og_image) ? gp247_file($og_image) : gp247_file(gp247_store_info('og_image', 'GP247/Core/images/org.jpg')) }}" />
     <meta property="og:url" content="{{ \Request::fullUrl() }}" />
-    <meta property="og:type" content="Website" />
-    <meta property="og:title" content="{{ $title??gp247_store_info('title') }}" />
-    <meta property="og:description" content="{{ $description??gp247_store_info('description') }}" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700%7CLato%7CKalam:300,400,700">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- Swiper CSS -->
-<!-- Owl Carousel CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
-    <!-- css default for item gp247 -->
-    @include($GP247TemplatePath.'.common.css')
-    <!--//end css defaut -->
+    <meta property="og:type" content="website" />
 
-    <!--Module header -->
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700%7CLato%7CKalam:300,400,700">
+
+    <!-- Bootstrap & Bootstrap Icons -->
+    <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/fonts.css') }}">
+
+    <!-- Custom CSS for GP247 items -->
+    @include($GP247TemplatePath . '.common.css')
+
+    <!-- Render Header Module -->
     {!! gp247_render_block('header', $layout_page ?? null) !!}
-    <!--//Module heade -->
-    
-    <link rel="stylesheet" href="{{url('public/GP247/Templates/Default/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{ url('public/GP247/Templates/Default/css/fonts.css')}}">
-    <link rel="stylesheet" href="{{ url('public/GP247/Templates/Default/css/style.css')}}">
 
+    <!-- Additional Page-Specific Styles -->
     @stack('styles')
-  </head>
+</head>
+
 <body>
  
  
@@ -126,14 +138,19 @@
     <div id="gp247-loading">
         <div class="gp247-overlay"><i class="fa fa-spinner fa-pulse fa-5x fa-fw "></i></div>
     </div>
-
-    <script src="url('GP247/Templates/Default/js/core.min.js')}}"></script>
-    <script src="{{ url('GP247/Templates/Default/js/script.js')}}"></script>
+     
+      <script src="{{ url('GP247/Templates/Default/js/bootstrap.bundle.min.js')}}"></script>
+      <script src="{{ url('GP247/Templates/Default/js/script.js')}}"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="{{url('GP247/Templates/Default/js/core.min.js')}}"></script>
     
+    
+     
     <!-- js default for item gp247 -->
     @include($GP247TemplatePath.'.common.js')
     <!--//end js defaut -->
     @stack('scripts')
+   
 
 </body>
 </html>

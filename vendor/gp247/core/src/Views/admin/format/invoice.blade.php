@@ -174,6 +174,10 @@
     $('.dont-print').show();
   }
 </script>
+<!-- Auto trigger print on load -->
+<script>
+    // window.onload = () => window.print();
+</script>
 <style>
   body{
     margin-top:20px;

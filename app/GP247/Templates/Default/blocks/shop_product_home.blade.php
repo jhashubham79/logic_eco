@@ -69,7 +69,7 @@ $home = DB::table('gp247_front_page_description')
     </div>
 
     <div class="card-see-all">
-      <a href="#">See all</a>
+      <a href="{{url('product')}}">See all</a>
 
     </div>
   </div>

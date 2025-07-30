@@ -27,8 +27,16 @@ Route::group(
             ->name('customer.index');
         $router->get('/'.$prefixCustomerOrderList.$suffix, $nameSpaceFrontCustomer.'\ShopAccountController@orderList')
             ->name('customer.order_list');
+            
         $router->get('/'.$prefixCustomerOrderDetail.'/{id}', $nameSpaceFrontCustomer.'\ShopAccountController@orderDetail')
             ->name('customer.order_detail');
+            
+            $router->get('invoice/{id}', $nameSpaceFrontCustomer.'\ShopAccountController@invoice')
+            ->name('customer.invoice');
+            
+           
+            
+            
         $router->get('/'.$prefixCustomerAddresList.$suffix, $nameSpaceFrontCustomer.'\ShopAccountController@addressList')
             ->name('customer.address_list');
         $router->get('/'.$prefixCustomerUpdateAddres.'/{id}', $nameSpaceFrontCustomer.'\ShopAccountController@updateAddress')

@@ -1179,4 +1179,53 @@ class ShopCartController extends RootFrontController
         $this->clearSession();
         gp247_order_process_after_success($orderID);
     }
+    
+    
+    
+    
+    
+    
+    public function multiAddToCart()
+{
+    $data = gp247_clean(request()->all());
+
+    $productIds = $data['products'] ?? [];
+    $quantities = $data['qty'] ?? [];
+    $storeId    = $data['storeId'] ?? config('app.storeId');
+
+    if (empty($productIds)) {
+        return redirect()->back()->with(['error' => 'No products selected.']);
+    }
+
+    $cart = new Cart;
+    $addedCount = 0;
+
+    foreach ($productIds as $productId) {
+        $qty = isset($quantities[$productId]) ? (int) $quantities[$productId] : 1;
+
+        $product = (new ShopProduct)->getDetail($productId, null, $storeId);
+        if (!$product || !$product->allowSale()) {
+            continue;
+        }
+
+        $dataCart = [
+            'id'      => $productId,
+            'name'    => $product->name,
+            'qty'     => $qty,
+            'storeId' => $storeId,
+            'options' => [],
+        ];
+
+        $cart->add($dataCart);
+        $addedCount++;
+    }
+
+    if ($addedCount > 0) {
+        return redirect(gp247_route_front('cart'))
+            ->with(['success' => "$addedCount product(s) added to cart."]);
+    } else {
+        return redirect()->back()->with(['error' => 'No products were added.']);
+    }
+}
+
 }

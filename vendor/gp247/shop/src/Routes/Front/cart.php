@@ -34,6 +34,10 @@ Route::group(
         //Add to cart
         $router->post('/cart_add', $nameSpaceFrontCart.'\ShopCartController@addToCart')
             ->name('cart.add');
+            
+            
+             $router->post('/cart_addmulti', $nameSpaceFrontCart.'\ShopCartController@multiAddToCart')
+            ->name('cart.multi_add');
 
         //Add to cart ajax
         $router->post('/add_to_cart_ajax', $nameSpaceFrontCart.'\ShopCartController@addToCartAjax')

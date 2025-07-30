@@ -6,6 +6,7 @@ use GP247\Core\Models\AdminLanguage;
 use Validator;
 use GP247\Shop\Admin\Models\AdminCategory;
 use GP247\Core\Models\AdminCustomField;
+use DB;
 
 class AdminCategoryController extends RootAdminController
 {
@@ -226,19 +227,61 @@ class AdminCategoryController extends RootAdminController
         ];
         $dataCreate = gp247_clean($dataCreate, [], true);
         $category = AdminCategory::createCategoryAdmin($dataCreate);
-        $dataDes = [];
-        $languages = $this->languages;
-        foreach ($languages as $code => $value) {
-            $dataDes[] = [
-                'category_id' => $category->id,
-                'lang'        => $code,
-                'title'       => $data['descriptions'][$code]['title'],
-                'keyword'     => $data['descriptions'][$code]['keyword'],
-                'description' => $data['descriptions'][$code]['description'],
-            ];
+       $dataDes = [];
+$languages = $this->languages;
+$usps = $data['usps'];
+$images = $data['images'];
+
+foreach ($languages as $code => $value) {
+    $description = [
+        'category_id' => $category->id,
+        'lang'        => $code,
+        'title'       => $data['descriptions'][$code]['title'] ?? '',
+        'keyword'     => $data['descriptions'][$code]['keyword'] ?? '',
+        'description' => $data['descriptions'][$code]['description'] ?? '',
+        
+        'faq' => json_encode(array_values(array_filter($descriptions[$code]['faq'] ?? [], function ($faq) {
+                return !empty($faq['question']) || !empty($faq['answer']);
+            }))),
+    ];
+
+    // Attach USP data per language
+    for ($i = 1; $i <= 4; $i++) {
+        $description["usp_{$i}_name"] = $usps[$i]['name'] ?? null;
+        $description["usp_{$i}_content"] = $usps[$i]['content'] ?? null;
+
+        // Handle image upload
+        if (request()->hasFile("usps.$i.image")) {
+            $file = request()->file("usps.$i.image");
+            $filename = time() . "_usp_{$i}_" . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/usp'), $filename);
+            $description["usp_{$i}_image"] = 'uploads/usp/' . $filename;
+        } else {
+            // Use existing image if available
+            $description["usp_{$i}_image"] = $usps[$i]['imageold'] ?? null;
         }
-        $dataDes  = gp247_clean($dataDes, [], true);
-        AdminCategory::insertDescriptionAdmin($dataDes);
+    }
+    
+    
+    
+     for ($i = 1; $i <= 2; $i++) {
+           
+            if (request()->hasFile("images.$i.image")) {
+                $file = request()->file("images.$i.image");
+                $filename = time() . "_cat_" . $i . "_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/category'), $filename);
+                $description["cat_{$i}_image"] = 'uploads/category/' . $filename;
+            } else {
+                $description["cat_{$i}_image"] = $images[$i]['imageold'] ?? null;
+            }
+        }
+    
+
+    $dataDes[] = $description;
+}
+
+$dataDes = gp247_clean($dataDes, [], true);
+AdminCategory::insertDescriptionAdmin($dataDes);
 
         if (gp247_store_check_multi_store_installed()) {
             // If multi-store
@@ -340,19 +383,66 @@ class AdminCategoryController extends RootAdminController
         ];
         $dataUpdate = gp247_clean($dataUpdate, [], true);
         $category->update($dataUpdate);
-        $category->descriptions()->delete();
-        $dataDes = [];
-        foreach ($data['descriptions'] as $code => $row) {
-            $dataDes[] = [
-                'category_id' => $id,
-                'lang'        => $code,
-                'title'       => $row['title'],
-                'keyword'     => $row['keyword'],
-                'description' => $row['description'],
-            ];
+       // $category->descriptions()->delete();
+        $usps = $data['usps'];
+        $images = $data['images'];
+
+foreach ($data['descriptions'] as $code => $row) {
+    $record = [
+        'category_id' => $id,
+        'lang'        => $code,
+        'title'       => $row['title'],
+        'keyword'     => $row['keyword'],
+        'description' => $row['description'],
+        
+        
+         'faq' => json_encode(array_values(array_filter($row['faq'] ?? [], function ($faq) {
+    return !empty($faq['question']) || !empty($faq['answer']);
+}))),
+        
+    ];
+
+    // Only attach USP fields for English language
+    if ($code === 'en') {
+        for ($i = 1; $i <= 4; $i++) {
+            $record["usp_{$i}_name"] = $usps[$i]['name'] ?? null;
+            $record["usp_{$i}_content"] = $usps[$i]['content'] ?? null;
+
+            if (request()->hasFile("usps.$i.image")) {
+                $file = request()->file("usps.$i.image");
+                $filename = time() . "_usp_" . $i . "_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/usp'), $filename);
+                $record["usp_{$i}_image"] = 'uploads/usp/' . $filename;
+            } else {
+                $record["usp_{$i}_image"] = $usps[$i]['imageold'] ?? null;
+            }
         }
-        $dataDes = gp247_clean($dataDes, [], true);
-        AdminCategory::insertDescriptionAdmin($dataDes);
+        
+        
+        //cat image
+        
+         for ($i = 1; $i <= 2; $i++) {
+           
+            if (request()->hasFile("images.$i.image")) {
+                $file = request()->file("images.$i.image");
+                $filename = time() . "_cat_" . $i . "_" . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/category'), $filename);
+                $record["cat_{$i}_image"] = 'uploads/category/' . $filename;
+            } else {
+                $record["cat_{$i}_image"] = $images[$i]['imageold'] ?? null;
+            }
+        }
+    }
+
+    // Now update or insert this single language record
+    DB::table('gp247_shop_category_description')->updateOrInsert(
+        ['category_id' => $id, 'lang' => $code],
+        $record
+    );
+}
+
+       // $dataDes = gp247_clean($dataDes, [], true);
+       // AdminCategory::insertDescriptionAdmin($dataDes);
 
         if (gp247_store_check_multi_store_installed()) {
             // If multi-store
