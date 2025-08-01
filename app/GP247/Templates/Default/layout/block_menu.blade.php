@@ -107,8 +107,14 @@ $categories = DB::table('gp247_shop_category_description')
             </li>
         @endif
     </ul>
+    
+    
+    
 
 </div>
+
+ <!-- RD Navbar Search-->
+                 
 
     </div>
   </div>

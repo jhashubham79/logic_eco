@@ -17,8 +17,11 @@ $home = DB::table('gp247_front_page_description')
       </div>
       <div class="col-md-7 col-sm-12">
          <div class="recommendation-form-wrapper">
-              <form class="recommendation-form">
-               <input type="text" placeholder="e.g., Need to Improve my SEO ..." />
+             
+             
+            \
+              <form class="recommendation-form" action="{{ gp247_route_front('front.search') }}"  method="GET">
+               <input type="text" name="keyword" value="{{ request('keyword') }}" placeholder="e.g., Need to Improve my SEO ..." />
                <button   type="submit">Get Recommendations</button>
             </form>
        </div>
@@ -199,44 +202,56 @@ $home = DB::table('gp247_front_page_description')
 
 <!-- Fanq -->
 
+
+
+
+<!-- Fanq -->
 <section class="faq-section py-5">
   <div class="container">
     <h2 class="text-center mb-4">FAQs ?</h2>
-    <div class="accordion faqsList " id="faqAccordion">
-      <!-- Item 1 (open by default) -->
-         @php
-         if($home->faqs) {
-           // Decode the JSON string into an array
-           $faqs = json_decode($home->faqs, true);
-         } else {
-           $faqs = [];
-         }  
-      
-      @endphp
-      @foreach($faqs as $index => $faq)
-      <div class="accordion-item mb-3 rounded shadow-sm">
-        <h2 class="accordion-header" id="faqHeadingOne{{$index}}">
-          <button class="accordion-button" type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#faqCollapseOne{{$index}}"
-            aria-expanded="true"
-            aria-controls="faqCollapseOne">
-           {{ $faq['question'] ?? 'Default Question' }}
-          </button>
-        </h2>
-        <div id="faqCollapseOne{{$index}}"
-             class="accordion-collapse collapse show"
-             aria-labelledby="faqHeadingOne{{$index}}"
-             data-bs-parent="#faqAccordion">
-          <div class="accordion-body">
-         {{ $faq['answer'] ?? 'Default Answer' }}
-          </div>
-        </div>
-      </div>
-      @endforeach
-    
+ 
+    @php
+      $faqItems = [];
+      $rawFaq = $home->faqs ??  null;
 
-      <!-- Add more items as needed -->
-    </div>
+      if (is_string($rawFaq)) {
+          $faqItems = json_decode($rawFaq, true) ?? [];
+      } elseif (is_array($rawFaq)) {
+          $faqItems = $rawFaq;
+      }
+    @endphp
+
+    @if (count($faqItems))
+      <div class="accordion faqsList" id="faqAccordion">
+        @foreach ($faqItems as $index => $faq)
+          <div class="accordion-item mb-3 rounded shadow-sm">
+            <h2 class="accordion-header" id="faqHeading{{ $index }}">
+              <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#faqCollapse{{ $index }}"
+                      aria-expanded="{{ $index == 0 ? 'true' : 'false' }}"
+                      aria-controls="faqCollapse{{ $index }}">
+                {{ $faq['question'] ?? 'No question provided' }}
+              </button>
+            </h2>
+            <div id="faqCollapse{{ $index }}"
+                 class="accordion-collapse collapse {{ $index == 0 ? 'show' : '' }}"
+                 aria-labelledby="faqHeading{{ $index }}"
+                 data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                {{ $faq['answer'] ?? 'No answer provided' }}
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    @else
+      <p class="text-center">No FAQs available for this product.</p>
+    @endif
   </div>
 </section>
+
+
+
+

@@ -104,7 +104,8 @@ class HomeController extends RootFrontController
         $keyword = request('keyword');
         $keyword = gp247_clean(data:$keyword, hight:true);
 
-        $searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
+        //$searchMode = config('gp247-config.front.GP247_SEARCH_MODE');
+            $searchMode = 'PRODUCT';   
 
         if (strtoupper($searchMode) === 'PRODUCT' && class_exists('\GP247\Shop\Models\ShopProduct')) {
             if ($keyword) {
@@ -167,6 +168,8 @@ class HomeController extends RootFrontController
             )
         );
     }
+
+
 
 
 

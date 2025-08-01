@@ -22,7 +22,7 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
       <div class="col-lg-8 col-sm-12">
           <div class=" catogory-section-heading position-relative">
         <!-- Left floating image -->
-        <img src="{{url($category->cat_1_image)}}" alt="Chart"
+        <img src="{{url($category->cat_1_image ?? '')}}" alt="Chart"
              class="floating-icon-left ">
 
         <!-- Heading and Subheading -->
@@ -30,7 +30,7 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
         <p >{{$category->description}}</p>
 
         <!-- Right floating image -->
-        <img src="{{url($category->cat_2_image)}}" alt="Target"
+        <img src="{{url($category->cat_2_image ?? '')}}" alt="Target"
              class="floating-icon-right">
          </div>
       </div>
@@ -100,14 +100,18 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
   </div>
   
   <!-- Search (Right Aligned) -->
-  <div class="col-md-6 col-12 mt-2 mt-md-0 text-md-end">
-    <div class="input-group" >
-      <span class="input-group-text bg-white border-end-0">
-        <i class="bi bi-search text-muted"></i>
-      </span>
-      <input type="text" class="form-control border-start-0" placeholder="Search">
-    </div>
+ <!-- Search Bar + Autocomplete -->
+<div class="col-md-6 col-12 mt-2 mt-md-0 text-md-end position-relative">
+  <div class="input-group">
+    <span class="input-group-text bg-white border-end-0">
+      <i class="bi bi-search text-muted"></i>
+    </span>
+    <input type="text" id="product-search" class="form-control border-start-0" placeholder="Search">
   </div>
+  
+  <!-- Autocomplete Suggestions -->
+  <ul id="search-suggestions" class="list-group position-absolute w-100 shadow-sm mt-1" style="z-index: 1050; display: none;"></ul>
+</div>
 </div>
 
     <div class="card-box-img">
@@ -314,12 +318,74 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
   </div>
 </section>
  
+@php
+$productList = $products->map(function($product) {
+    return [
+        'name'  => $product->name,
+        'url'   => $product->getUrl(),
+        'price' => $product->price, // Adjust if formatted_price or money() wrapper
+        'image' => $product->image ?? asset('images/default.jpg'),
+    ];
+});
+@endphp
+
+
+
+
+
+ 
+ 
    
 @endsection
 {{-- //block_main_content_center --}}
 
 
 @push('styles')
+<style>
+#search-suggestions {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #fff;
+    width: 100%;
+}
+
+#search-suggestions li {
+    padding: 6px 12px;
+    cursor: default;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#search-suggestions li:last-child {
+    border-bottom: none;
+}
+
+.suggestion-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.suggestion-img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    flex-shrink: 0;
+}
+
+.suggestion-info {
+    flex-grow: 1;
+}
+
+.suggestion-price {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+</style>
+
+
       <!-- Render include css cart -->
       @php
           $view = gp247_shop_process_view($GP247TemplatePath, 'common.shop_css');
@@ -329,4 +395,61 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
 @endpush
 
 @push('scripts')
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const products = @json($productList);
+    const input = document.getElementById("product-search");
+    const suggestions = document.getElementById("search-suggestions");
+
+    input.addEventListener("input", function () {
+        const term = this.value.trim().toLowerCase();
+        suggestions.innerHTML = '';
+
+        if (term.length < 2) {
+            suggestions.style.display = 'none';
+            return;
+        }
+
+        const matches = products.filter(p =>
+            p.name.toLowerCase().includes(term)
+        ).slice(0, 10);
+
+        if (matches.length === 0) {
+            suggestions.innerHTML = `<li class="list-group-item text-muted">No results found</li>`;
+            suggestions.style.display = 'block';
+            return;
+        }
+
+        matches.forEach(p => {
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.innerHTML = `
+                <div class="suggestion-card">
+                    <img src="${p.image}" alt="${p.name}" class="suggestion-img">
+                    <div class="suggestion-info">
+                        <div class="fw-semibold">${p.name}</div>
+                        <div class="suggestion-price">$${parseFloat(p.price).toFixed(2)}</div>
+                    </div>
+                    <a href="${p.url}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+            `;
+            suggestions.appendChild(li);
+        });
+
+        suggestions.style.display = 'block';
+    });
+
+    // Prevent suggestions from hiding too soon
+    document.addEventListener("click", function (e) {
+        const isClickInside = input.contains(e.target) || suggestions.contains(e.target);
+        if (!isClickInside) {
+            suggestions.style.display = 'none';
+        }
+    });
+});
+</script>
+
+
 @endpush

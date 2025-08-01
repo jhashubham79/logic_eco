@@ -13,74 +13,260 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
 
 {{-- block_main_content_center --}}
 @section('block_main_content_center')
-<div class="col-lg-9 col-xl-9">
-  {{-- sub category --}}
-  @isset ($subCategory)
-    @if($subCategory->count())
-    <h6 class="aside-title">{{ gp247_language_render('front.sub_categories') }}</h6>
-    <div class="row item-folder">
-        @foreach ($subCategory as $key => $item)
-        <div class="col-6 col-sm-6 col-md-3">
-            <div class="item-folder-wrapper product-single">
-                <div class="single-products">
-                    <div class="productinfo text-center product-box-{{ $item->id }}">
-                        <a href="{{ $item->getUrl() }}"><img src="{{ gp247_file($item->getThumb()) }}"
-                                alt="{{ $item->title }}" /></a>
-                        <a href="{{ $item->getUrl() }}">
-                            <p>{{ $item->title }}</p>
-                        </a>
-                    </div>
-                </div>
-            </div>
+
+<!-- home section -->
+<section class="py-5 text-center  catogory-section-hero">
+  <div class="container mt-5 ">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-lg-8 col-sm-12">
+          <div class="shop-section-heading position-relative">
+        <!-- Left floating image -->
+        <img src="images/3.png" alt="Chart"
+             class="floating-shop-icon-left ">
+
+        <!-- Heading and Subheading -->
+        <h1>Your Digital Challenges. Our Expert Solutions.</h1>
+        <p>Speaks to the efficiency and positive outcomes users desire.</p>
+
+        <!-- Right floating image -->
+        <img src="images/5.png" alt="Target"
+             class="floating-shop-icon-right">
+         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- box section  -->
+<section class="py-5 feature-box-section">
+  <div class="container">
+    <div class="row g-4 text-start">
+
+      <!-- Box 1 -->
+      <div class="col-6 col-md-6 col-lg-3">
+        <div class="feature-box p-4 h-100">
+          <img src="images/2 2.png" alt="" class="img-fluid mb-2">
+          <h6>Expert</h6>
+          <p class="text-muted mb-0">Expert GTM Professionals</p>
         </div>
-        @endforeach
+      </div>
 
-      {{-- Render pagination --}}
-      @include($GP247TemplatePath.'.common.pagination', ['items' => $subCategory])
-      {{--// Render pagination --}}
-      
-    </div>
-    @endif
-  @endisset
-  {{-- //sub category --}}
+      <!-- Box 2 -->
+      <div class="col-6 col-md-6 col-lg-3">
+        <div class="feature-box p-4 h-100">
+          <img src="images/35.png" alt="" class="img-fluid mb-2">
+          <h6>Fixed price</h6>
+          <p class="text-muted mb-0">Fixed Price, No Surprises</p>
+        </div>
+      </div>
 
-  @if (count($products))
-    <div class="product-top-panel group-md">
-      <!-- Render pagination result -->
-      @include($GP247TemplatePath.'.common.pagination_result', ['items' => $products])
-      <!--// Render pagination result -->
-      
-      <!-- Render include filter sort -->
-      @php
-          $view = gp247_shop_process_view($GP247TemplatePath, 'common.shop_product_filter_sort');
-      @endphp
-      @include($view, ['filterSort' => $filter_sort])
-      <!--// Render include filter sort -->
+      <!-- Box 3 -->
+      <div class="col-6 col-md-6 col-lg-3">
+        <div class="feature-box p-4 h-100">
+          <img src="images/2 5.png" alt="" class="img-fluid mb-2">
+          <h6>Guaranteed</h6>
+          <p class="text-muted mb-0">Guaranteed Fix or Your money</p>
+        </div>
+      </div>
+
+      <!-- Box 4 -->
+      <div class="col-6 col-md-6 col-lg-3">
+        <div class="feature-box p-4 h-100">
+          <img src="images/2 6.png" alt="" class="img-fluid mb-2">
+          <h6>Same Day</h6>
+          <p class="text-muted mb-0">Same-Day Delivery (within 24h)</p>
+        </div>
+      </div>
+
     </div>
-    <!-- Product list -->
-    <div class="row row-30 row-lg-50">
-      @foreach ($products as $key => $product)
-      <div class="col-sm-6 col-md-4 col-lg-6 col-xl-4">
-          <!-- Render product single -->
-          @php
+  </div>
+</section>
+
+
+
+<!-- filtersection -->
+ <section class="filter-section mt-3">
+  <div class="container
+  ">
+    <div class="row justify-content-center ">
+      <div class="col-10 text-center">
+        <h2>Find Your Fix</h2>
+        <p>Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.</p>
+      </div>
+      <div class="col-lg-3  col-sm-12 text-center ">
+        <div class="filter-box side-box">
+          <div class="mobile-scroll">
+              @php
+
+ $cat = DB::table('gp247_shop_category_description')
+    ->get();   
+@endphp
+              
+             <button class=" btn-filter active" data-filter="all">All</button>
+              @foreach($cat as $category)
+            <button class=" btn-filter" data-filter="{{ $category->category_id }}">{{ $category->title }} </button>
+             @endforeach
+
+              </div>
+        </div>
+      </div>
+<div class="col-lg-9 col-sm-12">
+  <div class="card-box">
+    <div class="card-box-img">
+      <img src="images/Group 35595.svg" alt="">
+    </div>
+       <div class="card-grid-scrollable-shop" >
+    <div class="row g-4 ">
+       @if (count($products))
+       
+       @foreach ($products as $key => $product)
+       @php
+    $categoryIds = $product->categories->pluck('id')->toArray();
+    $categoryString = implode(' ', $categoryIds); // space-separated
+  @endphp
+       
+      <div class=" col-lg-4 col-md-6 col-sm-12 card-item " data-category="{{ $categoryString }}">
+        @php
               $view = gp247_shop_process_view($GP247TemplatePath, 'common.shop_product_single');
           @endphp
           @include($view, ['product' => $product])
-          <!-- //Render product single -->
-        </div>
-      @endforeach
-    </div>
-    <!-- //Product list -->
-
-    <!-- Render pagination -->
-    @include($GP247TemplatePath.'.common.pagination', ['items' => $products])
-    <!--// Render pagination -->
-  @else
+      </div>
+@endforeach
+ @else
   <div class="product-top-panel group-md">
     <p style="text-align:center">{!! gp247_language_render('front.no_item') !!}</p>
   </div>
   @endif
+      
+
+      </div>
+
+    </div>
+<!-- 
+    <div class="card-see-all">
+      <a href="#">See all</a>
+
+    </div> -->
+  </div>
 </div>
+
+    </div>
+  </div>
+ </section>
+<!-- filtersection -->
+
+<section class="simple-section text-center">
+  <div class="container">
+    <div class="row ">
+      <div class="col-12">
+        <div>
+          <h2>Your Problem, Solved in 3 Simple Steps</h2>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="simple-border">
+          <div class="row pd-40 mgap">
+            <div class="col-md-4 col-sm-12">
+              <div class="step-item stepBoxWrap">
+              <div class="stepBox">
+                <img src="images/3 (2).png" class="step-icon" alt="Step 1">
+              <div class="steptxt">
+                <p  class="steps">STEP 1</p>
+                <h5>Choose Your Fix</h5>
+                <p class="status">Completed</p>
+              </div>
+               <div class="arrow-image1 d-none d-md-block d-lg-block" ><svg class="custom-arrow-svg" xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
+               <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
+               </svg></div>
+               <div class="mobile_arrow1 d-md-none"><svg  xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
+                    <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
+                    </svg></div>
+              </div>
+            </div>
+            </div>
+
+             <div class="col-md-4 col-sm-12">
+              <div class="step-item stepBoxWrap">               
+                <div class="stepBox">
+                   <img src="images/3 (3).png" class="step-icon" alt="Step 1">
+                   <div class="steptxt">
+                    <p  class="steps">STEP 2</p>
+                    <h5>Submit Your Details</h5>
+                    <p class="status">Completed</p>
+                   </div>                  
+                  <div class="arrow-image2 d-none d-md-block d-lg-block" ><svg class="custom-arrow-svg" xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
+                  <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
+                  </svg></div>
+                    <div class="mobile_arrow2 d-md-none"><svg  xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
+                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
+                        </svg></div>
+                </div>
+            </div>
+            </div>
+
+             <div class="col-md-4 col-sm-12">
+              <div class="step-item stepBoxWrap">                
+              <div class="stepBox">
+                <img src="images/3 (1).png" class="step-icon" alt="Step 1">
+                <div class="steptxt">
+                  <p  class="steps">STEP 3</p>
+                  <h5>Consider It Done</h5>
+                  <p class="status">Completed</p> 
+                </div>                
+              </div>          
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+ <!-- formsection -->
+
+<section class="custom-contact-section mb-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-12">
+        <div class=" custom-contact-bg d-flex align-items-center justify-content-center" style="background-image: url(images/Rectangle.png); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
+           <div class="row w-100 align-items-center">
+    <div class="col-md-6 col-sm-12 text-white">
+      <div class="contact-form-heading">
+                 <h3 >Have a Different Problem?</h3>
+                        <p >
+                         If you don’t see the exact service you need, don’t worry.
+                         We can likely create a custom fix for you. Get in touch for a
+                        bespoke quote from our experts.
+                        </p>
+
+              </div>
+            </div>
+            <div class="col-md-6 ">
+        <form>
+          <div class="row g-2">
+            <div class="col-md-6 col-sm-12">
+              <input type="text" class="form-control" placeholder="Full Name" required />
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <input type="text" class="form-control" placeholder="Email or Phone number" required />
+            </div>
+            <div class="col-12">
+              <textarea class="form-control" placeholder="Write..." rows="3" required></textarea>
+            </div>
+            <div class="col-12 text-end">
+              <button type="submit" class="btn btn-pink mt-2">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 @endsection
 {{-- //block_main_content_center --}}
 
