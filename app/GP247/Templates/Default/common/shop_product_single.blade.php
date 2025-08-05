@@ -1,13 +1,11 @@
 
-
- <div class="filter-card">
+        <div class="filter-card">
           <div class="icon-image"><img src="{{ gp247_file($product->getThumb()) }}" alt="{{ $product->name }}"  class="img-fluid"></div>
           <h4>{{ $product->name }}</h4>
           {!! $product->description !!}
           <div class="filter-price">
-            <span class="price">{{ $product->price }}$</span>
-            <button class="btn btn-primary filter-price-btn" onclick="window.location='{{ $product->getUrl() }}'">Buy Now</button>
-
+            <span class="price">${{ $product->price }}</span>
+            <button class="filter-price-btn" onclick="window.location='{{ $product->getUrl() }}'">Buy Now</button>
           </div>
         </div>
 

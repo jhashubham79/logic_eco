@@ -37,8 +37,9 @@ $layout_page = shop_product_detail
 
          
         <!-- Right floating image -->
-        <img src="{{url($product->images[0]->image ?? '')}}" alt="Target"
-             class="floating-icon-right-product">
+        @if (!empty($product->images) && isset($product->images[0]->image))
+        <img src="{{ url($product->images[0]->image) }}" alt="Target" class="floating-icon-right-product">
+         @endif
 
              <div class="product-section-btn">
                 <p><span class="font-weight-bold">${{ $product->price }}</span> / One-Time Fix</p>
@@ -61,10 +62,27 @@ $layout_page = shop_product_detail
               
             </form>
                 
+                <br>
                 
-               
+                <form action="{{ gp247_route_front('buy.now') }}" method="POST" class="btn-products">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="product_id" id="product-detail-id" value="{{ $product->id }}" />
+                                    <input type="hidden" name="storeId" id="product-detail-storeId" value="{{ $product->store_id ?? 1 }}" />
+                                    <input type="hidden" name="form_attr[10]" id="form_attr_10" value="">
+                                    <input type="hidden" name="form_attr[11]" id="form_attr_11" value="">
+                                    <input type="hidden" name="form_attr[12]" id="form_attr_12" value="">
+                                    <input type="hidden" name="buy_now_sitting" id="buy_now_sitting" value="" />
+                                    <input type="hidden" name="buy_now_recliner" id="buy_now_recliner" value="" />
+                                    <input type="hidden" name="buy_now_color" id="buy_now_color" value="" />
+                                    <input name="qty" id="qty1" class="qty qty-value" type="hidden" data-zeros="true" value="1" min="1" max="100"/>
+                                    <input type="hidden" name="instance" value="buynow" />
+                                    <button class="btn-products" type="submit" id="buyNowButton" >Buy Now</button>
+                                </form>
 
              </div>
+             
+           
+
          </div>
       </div>
     </div>
@@ -190,11 +208,19 @@ $layout_page = shop_product_detail
 </section>
 
 
+
+
+
+
+
+
+
+
 <!-- Related Product Section -->
 <section class="price-section-product py-5">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-12">
+      <div class="col--10 col-sm-12">
         <div class="price-section text-center"> 
           <h2>Enhance Your Solution</h2>
           <p>
@@ -232,6 +258,7 @@ $layout_page = shop_product_detail
 @endphp
 
 @if($relatedProducts->count())
+
 <form id="multi-add-to-cart" action="{{ gp247_route_front('cart.multi_add') }}" method="POST">
   @csrf
 
@@ -249,10 +276,14 @@ $layout_page = shop_product_detail
              id="main-product-qty">
     </div>
  
-
+ <div class="col-md-10 col-sm-12 mx-auto">
+            <div>
+              <div class="price-section-cards">
   {{-- Related products --}}
   @foreach ($relatedProducts as $relProd)
-    <div class="form-check form-product border-bottom py-3 d-flex justify-content-between align-items-start">
+    
+        
+    <div class="form-check form-product border-bottom">
       <div>
         <input 
             class="form-check-input product-checkbox" 
@@ -279,17 +310,22 @@ $layout_page = shop_product_detail
                disabled>
       </div>
     </div>
+    
+   
   @endforeach
 
   <div class="product-price-sec mt-4 text-center">
-    <div class="price-badge-product mb-3">
+    <div class="price-badge-product">
       <!--<span class="badge bg-success d-none d-md-inline-block">Saving 20%</span>-->
       <div class="product-total fs-5">Total: <span class="total price">$0.00</span></div>
     </div>
-    <button type="submit" class="product-price-btn btn btn-warning px-5">
+    <button type="submit" class="product-price-btn">
       Buy  
     </button>
   </div>
+  </div>
+</div>
+</div>
 </form>
 @endif
 
@@ -304,120 +340,120 @@ $layout_page = shop_product_detail
  <!-- simple step  -->
 
  
-<section class="simple-section text-center">
-  <div class="container">
-    <div class="row ">
-      <div class="col-12">
-        <div>
-          <h2>Your Problem, Solved in 3 Simple Steps</h2>
+<section class="simple-section text-center mt-5">
+    <div class="container">
+      <div class="row ">
+        <div class="col-12">
+          <div>
+            <h2>Your Problem, Solved in 3 Simple Steps</h2>
+          </div>
         </div>
-      </div>
-      <div class="col-12">
-        <div class="simple-border">
-          <div class="row pd-40 mgap">
-            <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">
-              <div class="stepBox">
-                <img src="/images/3 (2).png" class="step-icon" alt="Step 1">
-              <div class="steptxt">
-                <p  class="steps">STEP 1</p>
-                <h5>Choose Your Fix</h5>
-                <p class="status">Completed</p>
-              </div>
-               <div class="arrow-image1 d-none d-md-block d-lg-block" ><svg class="custom-arrow-svg" xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
-               <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
-               </svg></div>
-               <div class="mobile_arrow1 d-md-none"><svg  xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
-                    <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
-                    </svg></div>
-              </div>
-            </div>
-            </div>
-
-             <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">               
-                <div class="stepBox">
-                   <img src="/images/3 (3).png" class="step-icon" alt="Step 1">
-                   <div class="steptxt">
-                    <p  class="steps">STEP 2</p>
-                    <h5>Submit Your Details</h5>
-                    <p class="status">Completed</p>
-                   </div>                  
-                  <div class="arrow-image2 d-none d-md-block d-lg-block" ><svg class="custom-arrow-svg" xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
-                  <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
-                  </svg></div>
-                    <div class="mobile_arrow2 d-md-none"><svg  xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
-                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
-                        </svg></div>
+        <div class="col-12">
+          <div class="simple-border">
+            <div class="row pd-40 mgap">
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step1.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 1</p>
+                      <h5>Choose Your Fix</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                    <div class="arrow-image1 d-none d-md-block d-lg-block"><svg class="custom-arrow-svg"
+                        xmlns="http://www.w3.org/2000/svg" width="268" height="4" viewBox="0 0 268 4" fill="none">
+                        <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round" />
+                      </svg></div>
+                    <div class="mobile_arrow1 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48"
+                        viewBox="0 0 3 48" fill="none">
+                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round" />
+                      </svg></div>
+                  </div>
                 </div>
-            </div>
-            </div>
+              </div>
 
-             <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">                
-              <div class="stepBox">
-                <img src="/images/3 (1).png" class="step-icon" alt="Step 1">
-                <div class="steptxt">
-                  <p  class="steps">STEP 3</p>
-                  <h5>Consider It Done</h5>
-                  <p class="status">Completed</p> 
-                </div>                
-              </div>          
-            </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step2.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 2</p>
+                      <h5>Submit Your Details</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                    <div class="arrow-image2 d-none d-md-block d-lg-block"><svg class="custom-arrow-svg"
+                        xmlns="http://www.w3.org/2000/svg" width="268" height="4" viewBox="0 0 268 4" fill="none">
+                        <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round" />
+                      </svg></div>
+                    <div class="mobile_arrow2 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48"
+                        viewBox="0 0 3 48" fill="none">
+                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round" />
+                      </svg></div>
+                  </div>
+                </div>
+              </div>
 
-
- <!-- formsection -->
-
-<section class="custom-contact-section">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-12">
-        <div class=" custom-contact-bg d-flex align-items-center justify-content-center" style="background-image: url(images/Rectangle.png); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
-           <div class="row w-100 align-items-center">
-    <div class="col-md-6 col-sm-12 text-white">
-      <div class="contact-form-heading">
-                 <h3 >Have a Different Problem?</h3>
-                        <p >
-                         If you don’t see the exact service you need, don’t worry.
-                         We can likely create a custom fix for you. Get in touch for a
-                        bespoke quote from our experts.
-                        </p>
-
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step3.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 3</p>
+                      <h5>Consider It Done</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="col-md-6 ">
-        <form>
-          <div class="row g-2">
-            <div class="col-md-6 col-sm-12">
-              <input type="text" class="form-control" placeholder="Full Name" required />
-            </div>
-            <div class="col-md-6 col-sm-12">
-              <input type="text" class="form-control" placeholder="Email or Phone number" required />
-            </div>
-            <div class="col-12">
-              <textarea class="form-control" placeholder="Write..." rows="3" required></textarea>
-            </div>
-            <div class="col-12 text-end">
-              <button type="submit" class="btn btn-pink mt-2">Submit</button>
-            </div>
           </div>
-        </form>
-      </div>
-           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+  <!-- formsection -->
+  <section class="custom-contact-section mb-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-12">
+          <div class=" custom-contact-bg d-flex align-items-center justify-content-center"
+            style="background-image: url(/images/rectangle.webp); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
+            <div class="row w-100 align-items-center">
+              <div class="col-md-6 col-sm-12 text-white">
+                <div class="contact-form-heading">
+                  <h3>Have a Different Problem?</h3>
+                  <p>
+                    If you don’t see the exact service you need, don’t worry.
+                    We can likely create a custom fix for you. Get in touch for a
+                    bespoke quote from our experts.
+                  </p>
 
-
+                </div>
+              </div>
+              <div class="col-md-6 ">
+                <form>
+                  <div class="row g-2">
+                    <div class="col-md-6 col-sm-12">
+                      <input type="text" class="form-control" placeholder="Full Name" required />
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      <input type="text" class="form-control" placeholder="Email or Phone number" required />
+                    </div>
+                    <div class="col-12">
+                      <textarea class="form-control" placeholder="Write..." rows="3" required></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                      <button type="submit" class="btn btn-pink mt-2">Submit</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 <!-- Fanq -->
 <section class="faq-section py-5">
   <div class="container">

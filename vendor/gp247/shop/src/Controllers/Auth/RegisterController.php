@@ -154,7 +154,7 @@ class RegisterController extends RootFrontController
     public function register(Request $request)
     {
         $data = $request->all();
-        $this->validator($data)->validate();
+       // $this->validator($data)->validate();
         $user = $this->create($data);
 
         if ($user) {

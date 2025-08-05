@@ -22,19 +22,16 @@
     <meta property="og:url" content="{{ \Request::fullUrl() }}" />
     <meta property="og:type" content="website" />
 
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700%7CLato%7CKalam:300,400,700">
-
+   
     <!-- Bootstrap & Bootstrap Icons -->
     <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- Owl Carousel -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
-
+  
     <!-- Core Styles -->
     <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/style.css') }}">
     <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/fonts.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css"
+    integrity="sha512-rd0qOHVMOcez6pLWPVFIv7EfSdGKLt+eafXh4RO/12Fgr41hDQxfGvoi1Vy55QIVcQEujUE1LQrATCLl2Fs+ag=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Custom CSS for GP247 items -->
     @include($GP247TemplatePath . '.common.css')
@@ -141,7 +138,7 @@
      
       <script src="{{ url('GP247/Templates/Default/js/bootstrap.bundle.min.js')}}"></script>
       <script src="{{ url('GP247/Templates/Default/js/script.js')}}"></script>
-      <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+      <!--<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
     <script src="{{url('GP247/Templates/Default/js/core.min.js')}}"></script>
     
     

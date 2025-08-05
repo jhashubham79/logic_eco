@@ -54,5 +54,20 @@ Route::group(
         //Clear cart
         $router->get('/clear_cart/{instance}', $nameSpaceFrontCart.'\ShopCartController@clearCartProcessFront')
             ->name('cart.clear');
+            
+            
+            
+             //buy now direct
+             
+             
+    
+            
+             $router->post('/buy_now', $nameSpaceFrontCart.'\ShopCartController@buyNow')
+        ->name('buy.now');
+    
+             
     }
+    
+    
+    
 );

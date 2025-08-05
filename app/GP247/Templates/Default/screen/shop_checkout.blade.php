@@ -12,9 +12,18 @@ $layout_page = shop_checkout
 - $countries: array
 - $attributesGroup: array
 */
+
+      $action_url = 'checkout.process';
+    $current_url = url()->current(); 
+    
+    $count = count(explode('/',$current_url));
+    if (explode('/',$current_url)[$count-1] == "buynow") {
+        $action_url = 'checkout.lastbuynow';
+    }
 @endphp
 
 @extends($GP247TemplatePath.'.layout')
+
 
 @section('block_main')
 <section class="section section-xl bg-default text-md-left">
@@ -38,7 +47,7 @@ $layout_page = shop_checkout
 
 
             <div class="col-md-12">
-            <form class="gp247-shipping-address" id="gp247-form-process" role="form" method="POST" action="{{ gp247_route_front('checkout.process') }}">
+            <form class="gp247-shipping-address" id="gp247-form-process" role="form" method="POST" action="{{ gp247_route_front($action_url) }}">
                 @csrf
                 <div class="row">
                     {{-- Begin address shipping --}}

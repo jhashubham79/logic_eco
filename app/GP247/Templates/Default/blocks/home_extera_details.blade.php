@@ -30,7 +30,7 @@ $home = DB::table('gp247_front_page_description')
   </div>
 
   <div class="problem-section-img">
-    <img src="images/2.png" class="img-fluid" alt="">
+    <img src="{{url('images/2.webp')}}" class="img-fluid" alt="image">
      
   </div>
 
@@ -130,27 +130,125 @@ $home = DB::table('gp247_front_page_description')
 
 <!-- testimonialsection -->
 <!-- Swiper -->
-<div class="container py-5">
-  <div class="owl-carousel video-3d-carousel">
 
-    <!-- Slide 1 -->
-    <div class="video-item">
-      <video src="images/1088330669-preview.mp4" muted poster="posters/poster1.jpg"></video>
+<!-- testimonialsection -->
+  <div class="testimonial-slider">
+    <div class="container-fluid">
+      <div class="buget-frendly-heading text-center">
+        <h2>Testimonials</h2>
+        <p>Real Results, Real Voices</p>
+      </div>
+      <div class="swiper-container">
+        <div class="swiper">
+          <div class="swiper-wrapper">
+            
+            <div class="swiper-slide swiper-slide--nine">
+              <div class="slide-content">
+                <div class="testimonial-video">
+                  <video controls="" controlslist="nodownload" class="w-100"><source src="" type="video/mp4"></video>
+                </div>
+                <div class="testimonial-user">
+                  <div class="t-username">
+                    <span class="t-username1">John Doe 6</span>
+                    <span class="user-p">Founder & CEO, Keka</span>
+                  </div>
+                  <div class="t-userimage">
+                    <img src="{{url('images/logo.webp')}}" alt="image">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-slide--nine">
+              <div class="slide-content">
+                <div class="testimonial-video">
+                  <video controls="" controlslist="nodownload" class="w-100"><source src="" type="video/mp4"></video>
+                </div>
+                <div class="testimonial-user">
+                  <div class="t-username">
+                    <span class="t-username1">John Doe 6</span>
+                    <span class="user-p">Founder & CEO, Keka</span>
+                  </div>
+                  <div class="t-userimage">
+                    <img src="{{url('images/logo.webp')}}" alt="image">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-slide--nine">
+              <div class="slide-content">
+                <div class="testimonial-video">
+                  <video controls="" controlslist="nodownload" class="w-100"><source src="" type="video/mp4"></video>
+                </div>
+                <div class="testimonial-user">
+                  <div class="t-username">
+                    <span class="t-username1">John Doe 6</span>
+                    <span class="user-p">Founder & CEO, Keka</span>
+                  </div>
+                  <div class="t-userimage">
+                    <img src="{{url('images/logo.webp')}}" alt="image">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-slide--nine">
+              <div class="slide-content">
+                <div class="testimonial-video">
+                  <video controls="" controlslist="nodownload" class="w-100"><source src="" type="video/mp4"></video>
+                </div>
+                <div class="testimonial-user">
+                  <div class="t-username">
+                    <span class="t-username1">John Doe 6</span>
+                    <span class="user-p">Founder & CEO, Keka</span>
+                  </div>
+                  <div class="t-userimage">
+                    <img src="{{url('images/logo.webp')}}" alt="image">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-slide--nine">
+              <div class="slide-content">
+                <div class="testimonial-video">
+                  <video controls="" controlslist="nodownload" class="w-100"><source src="" type="video/mp4"></video>
+                </div>
+                <div class="testimonial-user">
+                  <div class="t-username">
+                    <span class="t-username1">John Doe 6</span>
+                    <span class="user-p">Founder & CEO, Keka</span>
+                  </div>
+                  <div class="t-userimage">
+                    <img src="{{url('images/logo.webp')}}" alt="image">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="swiper-pagination"></div>
+
+        </div>
+
+        <!-- If we need navigation buttons -->
+        <div class="swiper-button-prev">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
+          </svg>
+        </div>
+        <div class="swiper-button-next">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+          </svg>
+        </div>
+
+
+      </div>
     </div>
-
-    <!-- Slide 2 -->
-    <div class="video-item">
-       <video src="images/1088330669-preview.mp4" muted poster="posters/poster1.jpg"></video>
-    </div>
-
-    <!-- Slide 3 -->
-    <div class="video-item">
-      <video src="images/1088330669-preview.mp4" muted poster="posters/poster1.jpg"></video>
-    </div>
-
-    <!-- Add more slides -->
   </div>
-</div>
+  <!-- testimonialsection -->
+
 
 <!-- testimonialsection -->
 
@@ -161,7 +259,7 @@ $home = DB::table('gp247_front_page_description')
   <div class="container">
     <div class="row align-items-center">
       <div class="col-md-12">
-        <div class=" custom-contact-bg d-flex align-items-center justify-content-center" style="background-image: url(images/Rectangle.png); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
+        <div class=" custom-contact-bg d-flex align-items-center justify-content-center" style="background-image: url(images/rectangle.webp); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
            <div class="row w-100 align-items-center">
     <div class="col-md-6 col-sm-12 text-white">
       <div class="contact-form-heading">
@@ -200,6 +298,10 @@ $home = DB::table('gp247_front_page_description')
 </section>
 
 
+
+
+
+
 <!-- Fanq -->
 
 
@@ -224,7 +326,7 @@ $home = DB::table('gp247_front_page_description')
     @if (count($faqItems))
       <div class="accordion faqsList" id="faqAccordion">
         @foreach ($faqItems as $index => $faq)
-          <div class="accordion-item mb-3 rounded shadow-sm">
+          <div class="accordion-item mb-3">
             <h2 class="accordion-header" id="faqHeading{{ $index }}">
               <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}"
                       type="button"

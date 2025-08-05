@@ -1,6 +1,6 @@
 {{-- breadcrumb --}}
 @if (!empty($breadcrumbs) && count($breadcrumbs))
-<section class="py-3 bg-light">
+<section class="py-1 bg-light">
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">

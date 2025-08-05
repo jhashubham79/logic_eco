@@ -11,6 +11,8 @@ use GP247\Shop\Models\ShopCustomer;
 use GP247\Shop\Models\ShopCustomerAddress;
 use GP247\Shop\Services\CartService as Cart;
 use Illuminate\Http\Request;
+use Session;
+//use Cart;
 use Illuminate\Support\Facades\Validator;
 
 class ShopCartController extends RootFrontController
@@ -160,6 +162,8 @@ class ShopCartController extends RootFrontController
     private function _getCheckout()
     {
         $storeCheckout = session('storeCheckout') ?? '';
+        
+        
         if (!$storeCheckout) {
             return redirect(gp247_route_front('cart'))->with(['error' => gp247_language_render('cart.item_notfound', ['item' => 'storeCheckout'])]);
         }
@@ -276,6 +280,7 @@ class ShopCartController extends RootFrontController
         $subPath = 'screen.shop_checkout';
         $view = gp247_shop_process_view($this->GP247TemplatePath,$subPath);
         gp247_check_view($view);
+        
         return view(
             $view,
             [
@@ -310,6 +315,7 @@ class ShopCartController extends RootFrontController
      */
     public function processCheckout()
     {
+        
         $dataCheckout  = session('dataCheckout') ?? '';
         $storeCheckout = session('storeCheckout') ?? '';
         //If cart info empty
@@ -431,6 +437,7 @@ class ShopCartController extends RootFrontController
      */
     private function _getCheckoutConfirm()
     {
+        
         //Check shipping address
         if (
             !session('shippingAddress')
@@ -818,6 +825,7 @@ class ShopCartController extends RootFrontController
                 break;
         }
 
+
         $carts = (new Cart)->getListCart($instance);
         return response()->json(
             [
@@ -1027,19 +1035,22 @@ class ShopCartController extends RootFrontController
      *
      * @return [redirect]
      */
-    public function completeOrder()
+    public function completeOrderbuynow()
     {
+        
+      
         //Clear cart store
-        $this->clearCartStore();
+        //$this->clearCartStore();
 
         $orderID = session('orderID') ?? 0;
         $paymentMethod  = session('paymentMethod');
         $shippingMethod = session('shippingMethod');
         $totalMethod    = session('totalMethod', []);
-
+//dd("ok");
         if ($orderID == 0) {
             return redirect()->route('front.home', ['error' => 'Error Order ID!']);
         }
+
 
         $classPaymentConfig = gp247_extension_get_namespace(type: 'Plugins', key: $paymentMethod);
         $classPaymentConfig = $classPaymentConfig . '\AppConfig';
@@ -1068,13 +1079,69 @@ class ShopCartController extends RootFrontController
                 }
             }
         }
-        
+         
         // Process event success
         gp247_event_order_success($order = ShopOrder::find($orderID));
 
         // Process after order compled: send mail, data response ...
         $this->processAfterOrderSuccess($orderID);
+ 
+        return redirect(gp247_route_front('order.success'))->with(['orderID' => $orderID]);
+    }
+    
+    
+    
+     public function completeOrder()
+    {
+        
+      
+        //Clear cart store
+        $this->clearCartStore();
 
+        $orderID = session('orderID') ?? 0;
+        $paymentMethod  = session('paymentMethod');
+        $shippingMethod = session('shippingMethod');
+        $totalMethod    = session('totalMethod', []);
+//dd("ok");
+        if ($orderID == 0) {
+            return redirect()->route('front.home', ['error' => 'Error Order ID!']);
+        }
+
+
+        $classPaymentConfig = gp247_extension_get_namespace(type: 'Plugins', key: $paymentMethod);
+        $classPaymentConfig = $classPaymentConfig . '\AppConfig';
+        if (class_exists($classPaymentConfig)) {
+            if (method_exists($classPaymentConfig, 'endApp')) {
+                (new $classPaymentConfig)->endApp();
+            }
+        }
+
+        $classShippingConfig = gp247_extension_get_namespace(type: 'Plugins', key: $shippingMethod);
+        $classShippingConfig = $classShippingConfig . '\AppConfig';
+        if (class_exists($classShippingConfig)) {
+            if (method_exists($classShippingConfig, 'endApp')) {
+                (new $classShippingConfig)->endApp();
+            }
+        }
+
+        if ($totalMethod && is_array($totalMethod)) {
+            foreach ($totalMethod as $keyMethod => $valueMethod) {
+                $classTotalConfig = gp247_extension_get_namespace(type: 'Plugins', key: $keyMethod);
+                $classTotalConfig = $classTotalConfig . '\AppConfig';
+                if (class_exists($classTotalConfig)) {
+                    if (method_exists($classTotalConfig, 'endApp')) {
+                        (new $classTotalConfig)->endApp(['orderID' => $orderID, 'code' => $valueMethod]);
+                    }
+                }
+            }
+        }
+         
+        // Process event success
+        gp247_event_order_success($order = ShopOrder::find($orderID));
+
+        // Process after order compled: send mail, data response ...
+        $this->processAfterOrderSuccess($orderID);
+ 
         return redirect(gp247_route_front('order.success'))->with(['orderID' => $orderID]);
     }
 
@@ -1145,7 +1212,7 @@ class ShopCartController extends RootFrontController
         $dataCheckout = session('dataCheckout') ?? '';
         if ($dataCheckout) {
             foreach ($dataCheckout as $key => $row) {
-                (new Cart)->remove($row->rowId);
+                (new Cart)->remove($row->rowId ?? '');
             }
         }
     }
@@ -1227,5 +1294,577 @@ class ShopCartController extends RootFrontController
         return redirect()->back()->with(['error' => 'No products were added.']);
     }
 }
+
+
+
+//buy now
+
+
+
+    public function buyNow()
+    {
+        $data      = request()->all();
+        
+        $inputData = request()->all();
+        session()->forget('cart.buynow');
+        $data      = gp247_clean($data);
+        $instance = $data['instance'] ?? 'default';
+        $productId = $data['product_id'];
+        $qty       = $data['qty'] ?? 0;
+        $storeId   = $data['storeId'] ?? config('app.storeId');
+        $cartService = app(Cart::class);
+        $cart = $cartService->instance($instance);
+       // $cart     = Cart::instance($instance);
+        Session::put('buy_now_content',$data);
+       // session(['cart.buynow' =>  'dds']);
+        //Process attribute price
+        $formAttr = $data['form_attr'] ?? [];
+        $optionPrice  = 0;
+        if ($formAttr) {
+            foreach ($formAttr as $key => $attr) {
+                $optionPrice += explode('__', $attr)[1] ??0;
+            }
+        }
+        //End attribute price
+        $product = (new ShopProduct)->getDetail($productId, null, $storeId);
+
+        if (!$product) {
+            return response()->json(
+                [
+                    'error' => 1,
+                    'msg' => gp247_language_render('front.data_notfound'),
+                ]
+            );
+        }
+
+
+        if ($product->allowSale()) {
+           
+            //dd($optionData);
+            $cart->add(
+                array(
+                    'id'      => $productId,
+                    'name'    => $product->name,
+                    'qty'     => $qty,
+                    'price'   => $product->price,
+                    'tax'     => $product->getTaxValue(),
+                    'storeId' => $storeId,
+                )
+            );
+            return redirect(gp247_route_front('checkout.buynow'))
+                ->with(
+                    ['success' => gp247_language_render('cart.add_to_cart_success', ['instance' => 'buy'])]
+                );
+        }else{
+            return redirect()->back()
+                ->with(
+                    ['error' => gp247_language_render('product.dont_allow_sale', ['sku' => $product->sku])]
+                );
+        }
+    }
+    public function getCheckoutFrontBuyNow(...$params)
+    {
+        if (config('app.seoLang')) {
+            $lang = $params[0] ?? '';
+            sc_lang_switch($lang);
+        }
+        return $this->_getCheckoutBuyNow();
+    }
+   
+   
+   private function _getCheckoutBuyNow()
+{
+    $dataCheckout = session('cart.buynow') ?? '';
+    $storeCheckout = session('storeCheckout') ?? 1;
+
+    // Validate session
+    if (!$dataCheckout || !$storeCheckout) {
+        return redirect(gp247_route_front('cart'))->with(['error' => gp247_language_render('cart.cart_empty')]);
+    }
+
+    // Save to standard session for compatibility with downstream logic
+    session(['dataCheckout' => $dataCheckout]);
+
+    // SHIPPING METHODS
+    $moduleShipping = gp247_extension_get_via_code(code: 'shipping');
+    $sourcesShipping = gp247_extension_get_all_local(type: 'Plugins');
+    $shippingMethod = [];
+    foreach ($moduleShipping as $module) {
+        if (array_key_exists($module['key'], $sourcesShipping)) {
+            $moduleClass = gp247_extension_get_namespace(type: 'Plugins', key: $module['key']) . '\AppConfig';
+            if (class_exists($moduleClass) && method_exists($moduleClass, 'getInfo')) {
+                $shippingMethod[$module['key']] = (new $moduleClass)->getInfo();
+            }
+        }
+    }
+
+    // PAYMENT METHODS
+    $modulePayment = gp247_extension_get_via_code(code: 'payment');
+    $sourcesPayment = gp247_extension_get_all_local(type: 'Plugins');
+    $paymentMethod = [];
+    foreach ($modulePayment as $module) {
+        if (array_key_exists($module['key'], $sourcesPayment)) {
+            $moduleClass = $sourcesPayment[$module['key']] . '\AppConfig';
+            if (class_exists($moduleClass) && method_exists($moduleClass, 'getInfo')) {
+                $paymentMethod[$module['key']] = (new $moduleClass)->getInfo();
+            }
+        }
+    }
+
+    // TOTAL METHODS
+    $moduleTotal = gp247_extension_get_via_code(code: 'total');
+    $sourcesTotal = gp247_extension_get_all_local(type: 'Plugins');
+    $totalMethod = [];
+    foreach ($moduleTotal as $module) {
+        if (array_key_exists($module['key'], $sourcesTotal)) {
+            $moduleClass = $sourcesTotal[$module['key']] . '\AppConfig';
+            if (class_exists($moduleClass) && method_exists($moduleClass, 'getInfo')) {
+                $totalMethod[$module['key']] = (new $moduleClass)->getInfo();
+            }
+        }
+    }
+
+    // CUSTOMER ADDRESS
+    $customer = customer()->user();
+    if ($customer) {
+        $address = $customer->getAddressDefault();
+        $addressDefaul = [
+            'first_name'      => $address->first_name ?? $customer->first_name,
+            'last_name'       => $address->last_name ?? $customer->last_name,
+            'first_name_kana' => $address->first_name_kana ?? $customer->first_name_kana,
+            'last_name_kana'  => $address->last_name_kana ?? $customer->last_name_kana,
+            'email'           => $customer->email,
+            'address1'        => $address->address1 ?? $customer->address1,
+            'address2'        => $address->address2 ?? $customer->address2,
+            'address3'        => $address->address3 ?? $customer->address3,
+            'postcode'        => $address->postcode ?? $customer->postcode,
+            'company'         => $customer->company,
+            'country'         => $address->country ?? $customer->country,
+            'phone'           => $address->phone ?? $customer->phone,
+            'comment'         => '',
+        ];
+    } else {
+        $addressDefaul = [
+            'first_name'      => '',
+            'last_name'       => '',
+            'first_name_kana' => '',
+            'last_name_kana'  => '',
+            'postcode'        => '',
+            'company'         => '',
+            'email'           => '',
+            'address1'        => '',
+            'address2'        => '',
+            'address3'        => '',
+            'country'         => '',
+            'phone'           => '',
+            'comment'         => '',
+        ];
+    }
+
+    $shippingAddress = session('shippingAddress') ?? $addressDefaul;
+    $objects = ShopOrderTotal::getObjectOrderTotal();
+
+    // CAPTCHA
+    $viewCaptcha = gp247_captcha_processview('checkout', gp247_language_render('cart.checkout'));
+
+    // VIEW
+    $subPath = 'screen.shop_checkout';
+    $view = gp247_shop_process_view($this->GP247TemplatePath, $subPath);
+    gp247_check_view($view);
+
+    return view(
+        $view,
+        [
+            'title'           => gp247_language_render('cart.checkout'),
+            'description'     => '',
+            'keyword'         => '',
+            'cartItem'        => $dataCheckout,
+            'storeCheckout'   => $storeCheckout,
+            'shippingMethod'  => $shippingMethod,
+            'paymentMethod'   => $paymentMethod,
+            'totalMethod'     => $totalMethod,
+            'addressList'     => $customer ? $customer->addresses : [],
+            'dataTotal'       => ShopOrderTotal::processDataTotalBuyNow($objects),
+            'shippingAddress' => $shippingAddress,
+            'countries'       => AdminCountry::getCodeAll(),
+            'attributesGroup' => ShopAttributeGroup::pluck('name', 'id')->all(),
+            'viewCaptcha'     => $viewCaptcha,
+            'layout_page'     => 'shop_checkout',
+            'breadcrumbs'     => [
+                ['url' => '', 'title' => gp247_language_render('cart.checkout')],
+            ],
+        ]
+    );
+}
+
+   
+    public function processCheckoutBuyNow()
+    {
+        $dataCheckout  = session('cart.buynow') ?? '';
+        $storeCheckout = session('storeCheckout') ?? 1;
+        //If cart info empty
+        if (!$dataCheckout || !$storeCheckout) {
+            return redirect(gp247_route_front('cart'))->with(['error' => gp247_language_render('cart.cart_empty')]);
+        }
+
+        
+        
+        $customer = customer()->user();
+
+        //Not allow for guest
+        if (!gp247_config('shop_allow_guest') && !$customer) {
+            return redirect(gp247_route_front('customer.login'));
+        }
+
+        $data = request()->all();
+
+        $dataMap = gp247_order_mapping_validate();
+        $validate = $dataMap['validate'];
+        $messages = $dataMap['messages'];
+
+        //Process captcha
+        if (gp247_captcha_method() && in_array('checkout', gp247_captcha_page())) {
+            $data['captcha_field'] = $data[gp247_captcha_method()->getField()] ?? '';
+            $validate['captcha_field'] = ['required', 'string', new \GP247\Core\Rules\CaptchaRule];
+        }
+
+        $v = Validator::make(
+            $data,
+            $validate,
+            $messages
+        );
+        if ($v->fails()) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($v->errors());
+        }
+
+        //Set session shippingMethod
+        if (!gp247_config('shipping_off')) {
+            session(['shippingMethod' => request('shippingMethod')]);
+        }
+
+        //Set session paymentMethod
+        if (!gp247_config('payment_off')) {
+            session(['paymentMethod' => request('paymentMethod')]);
+        }
+
+        //Set session address process
+        session(['address_process' => request('address_process')]);
+
+        //Set session shippingAddress shippingAddress
+        session(
+            [
+                'shippingAddress' => [
+                    'first_name'      => request('first_name'),
+                    'last_name'       => request('last_name'),
+                    'first_name_kana' => request('first_name_kana'),
+                    'last_name_kana'  => request('last_name_kana'),
+                    'email'           => request('email'),
+                    'country'         => request('country'),
+                    'address1'        => request('address1'),
+                    'address2'        => request('address2'),
+                    'address3'        => request('address3'),
+                    'phone'           => request('phone'),
+                    'postcode'        => request('postcode'),
+                    'company'         => request('company'),
+                    'comment'         => request('comment'),
+                ],
+            ]
+        );
+
+        //Check minimum
+        $arrCheckQty = [];
+        $cart = $dataCheckout;
+        foreach ($cart as $key => $row) {
+            $arrCheckQty[$row->id] = ($arrCheckQty[$row->id] ?? 0) + $row->qty;
+        }
+        $arrProductMinimum = ShopProduct::whereIn('id', array_keys($arrCheckQty))->pluck('minimum', 'id')->all();
+        $arrErrorQty = [];
+        foreach ($arrProductMinimum as $pId => $min) {
+            if ($arrCheckQty[$pId] < $min) {
+                $arrErrorQty[$pId] = $min;
+            }
+        }
+        if (count($arrErrorQty)) {
+            return redirect(gp247_route_front('cart'))->with('arrErrorQty', $arrErrorQty);
+        }
+        //End check minimum
+
+        return redirect(gp247_route_front('checkout.confirm.buynow'))->with('step', 'checkout.confirm');
+    }
+
+    public function getCheckoutConfirmFrontBuyNow(...$params)
+    {
+        if (GP247_SEO_LANG) {
+            $lang = $params[0] ?? '';
+            gp247_lang_switch($lang);
+        }
+        return $this->_getCheckoutConfirmBuyNow();
+    }
+
+   private function _getCheckoutConfirmBuyNow()
+{
+    // Validate shipping address
+    if (!session('shippingAddress')) {
+        return redirect(gp247_route_front('cart'))->with([
+            'error' => gp247_language_render('cart.item_notfound', ['item' => 'shippingAddress'])
+        ]);
+    }
+
+    $shippingAddress = session('shippingAddress');
+
+    // SHIPPING METHOD
+    $shippingMethodData = null;
+    if (gp247_config('use_shipping')) {
+        if (!session('shippingMethod')) {
+            return redirect(gp247_route_front('cart'))->with([
+                'error' => gp247_language_render('cart.item_notfound', ['item' => 'shippingMethod'])
+            ]);
+        }
+
+        $shippingMethod = session('shippingMethod');
+
+        // Check plugin validity
+        if (!gp247_config($shippingMethod)) {
+            return redirect(gp247_route_front('cart'))->with(['error' => 'Plugin shipping invalid!']);
+        }
+
+        // Load shipping method class
+        $classShippingMethod = gp247_extension_get_namespace(type: 'Plugins', key: $shippingMethod) . '\AppConfig';
+        if (class_exists($classShippingMethod)) {
+            $shippingMethodData = (new $classShippingMethod)->getInfo();
+        }
+    }
+
+    // PAYMENT METHOD
+    $paymentMethodData = null;
+    if (gp247_config('use_payment')) {
+        if (!session('paymentMethod')) {
+            return redirect(gp247_route_front('cart'))->with([
+                'error' => gp247_language_render('cart.item_notfound', ['item' => 'paymentMethod'])
+            ]);
+        }
+
+        $paymentMethod = session('paymentMethod');
+
+        // Check plugin validity
+        if (!gp247_config($paymentMethod)) {
+            return redirect(gp247_route_front('cart'))->with(['error' => 'Plugin payment invalid!']);
+        }
+
+        // Load payment method class
+        $classPaymentMethod = gp247_extension_get_namespace(type: 'Plugins', key: $paymentMethod) . '\AppConfig';
+        if (class_exists($classPaymentMethod)) {
+            $paymentMethodData = (new $classPaymentMethod)->getInfo();
+        }
+    }
+
+    // Confirm screen only active if coming from checkout
+    if (session('step', '') !== 'checkout.confirm') {
+        return redirect(gp247_route_front('checkout'));
+    }
+
+    // Calculate totals (for Buy Now)
+    $objects = ShopOrderTotal::getObjectOrderTotal();
+    $dataTotal = ShopOrderTotal::processDataTotalBuyNow($objects);
+
+    // Store in session
+    session(['dataTotal' => $dataTotal]);
+
+    // Resolve view
+    $subPath = 'screen.shop_checkout_confirm';
+    $view = gp247_shop_process_view($this->GP247TemplatePath, $subPath);
+    gp247_check_view($view);
+
+    return view(
+        $view,
+        [
+            'title'              => gp247_language_render('checkout.page_title'),
+            'cartItem'           => session('cart.buynow'),
+            'dataTotal'          => $dataTotal,
+            'paymentMethodData'  => $paymentMethodData,
+            'shippingMethodData' => $shippingMethodData,
+            'shippingAddress'    => $shippingAddress,
+            'attributesGroup'    => ShopAttributeGroup::getListAll(),
+            'layout_page'        => 'shop_checkout_confirm',
+            'breadcrumbs'        => [
+                ['url' => '', 'title' => gp247_language_render('checkout.page_title')],
+            ],
+        ]
+    );
+}
+
+    
+    public function addOrderBuyNow(Request $request)
+    {
+        $agent = new \Jenssegers\Agent\Agent();
+        $customer = auth()->user();
+        $uID = $customer->id ?? 0;
+
+        //if cart empty
+        if (count(session('cart.buynow', [])) == 0) {
+            return redirect()->route('home');
+        }
+        //Not allow for guest
+        // if (!gp247_config('shop_allow_guest') && !$customer) {
+        //     return redirect(gp247_route_front('login'));
+        // } //
+
+        $data = request()->all();
+        if (!$data) {
+            return redirect(gp247_route_front('cart'));
+        } else {
+            $dataTotal       = session('dataTotal') ?? [];
+            $shippingAddress = session('shippingAddress') ?? [];
+            $paymentMethod   = session('paymentMethod') ?? '';
+            $shippingMethod  = session('shippingMethod') ?? '';
+            $address_process = session('address_process') ?? '';
+            $storeCheckout   = session('storeCheckout') ?? '';
+            $dataCheckout    = session('cart.buynow') ?? '';
+        }
+
+        //Process total
+        $subtotal = (new ShopOrderTotal)->sumValueTotal('subtotal', $dataTotal); //sum total
+        $tax      = (new ShopOrderTotal)->sumValueTotal('tax', $dataTotal); //sum tax
+        $shipping = (new ShopOrderTotal)->sumValueTotal('shipping', $dataTotal); //sum shipping
+        $discount = (new ShopOrderTotal)->sumValueTotal('discount', $dataTotal); //sum discount
+        $otherFee = (new ShopOrderTotal)->sumValueTotal('other_fee', $dataTotal); //sum other_fee
+        $received = (new ShopOrderTotal)->sumValueTotal('received', $dataTotal); //sum received
+        $total    = (new ShopOrderTotal)->sumValueTotal('total', $dataTotal);
+        //end total
+
+        $dataOrder['store_id']        = $storeCheckout;
+        $dataOrder['customer_id']     = $uID;
+        $dataOrder['subtotal']        = $subtotal;
+        $dataOrder['shipping']        = $shipping;
+        $dataOrder['discount']        = $discount;
+        $dataOrder['other_fee']        = $otherFee;
+        $dataOrder['received']        = $received;
+        $dataOrder['tax']             = $tax;
+        $dataOrder['payment_status']  = self::PAYMENT_UNPAID;
+        $dataOrder['shipping_status'] = self::SHIPPING_NOTSEND;
+        $dataOrder['status']          = self::ORDER_STATUS_NEW;
+        $dataOrder['currency']        = gp247_currency_code();
+        $dataOrder['exchange_rate']   = gp247_currency_rate();
+        $dataOrder['total']           = $total;
+        $dataOrder['balance']         = $total + $received;
+        $dataOrder['email']           = $shippingAddress['email'];
+        $dataOrder['first_name']      = $shippingAddress['first_name'];
+        $dataOrder['payment_method']  = $paymentMethod;
+        $dataOrder['shipping_method'] = $shippingMethod;
+        $dataOrder['user_agent']      = $request->header('User-Agent');
+        $dataOrder['device_type']      = $agent->deviceType();
+        $dataOrder['ip']              = $request->ip();
+        $dataOrder['created_at']      = gp247_time_now();
+
+        if (!empty($shippingAddress['last_name'])) {
+            $dataOrder['last_name']       = $shippingAddress['last_name'];
+        }
+        if (!empty($shippingAddress['first_name_kana'])) {
+            $dataOrder['first_name_kana']       = $shippingAddress['first_name_kana'];
+        }
+        if (!empty($shippingAddress['last_name_kana'])) {
+            $dataOrder['last_name_kana']       = $shippingAddress['last_name_kana'];
+        }
+        if (!empty($shippingAddress['address1'])) {
+            $dataOrder['address1']       = $shippingAddress['address1'];
+        }
+        if (!empty($shippingAddress['address2'])) {
+            $dataOrder['address2']       = $shippingAddress['address2'];
+        }
+        if (!empty($shippingAddress['address3'])) {
+            $dataOrder['address3']       = $shippingAddress['address3'];
+        }
+        if (!empty($shippingAddress['country'])) {
+            $dataOrder['country']       = $shippingAddress['country'];
+        }
+        if (!empty($shippingAddress['phone'])) {
+            $dataOrder['phone']       = $shippingAddress['phone'];
+        }
+        if (!empty($shippingAddress['postcode'])) {
+            $dataOrder['postcode']       = $shippingAddress['postcode'];
+        }
+        if (!empty($shippingAddress['company'])) {
+            $dataOrder['company']       = $shippingAddress['company'];
+        }
+        if (!empty($shippingAddress['comment'])) {
+            $dataOrder['comment']       = $shippingAddress['comment'];
+        }
+
+        $arrCartDetail = [];
+        // dd($dataCheckout);
+        foreach ($dataCheckout as $cartItem) {
+            $product = (new ShopProduct)->getDetail(key: $cartItem->id, type: 'id', storeId: $cartItem->storeId);
+            if (!$product) {
+                continue;
+            }
+            $arrDetail['product_id']  = $cartItem->id;
+            $arrDetail['name']        = $cartItem->name;
+            $arrDetail['price']       = gp247_currency_value($product->getFinalPrice());
+            $arrDetail['qty']         = $cartItem->qty;
+            $arrDetail['store_id']    = $cartItem->storeId;
+            $arrDetail['attribute']   = ($cartItem->options) ? $cartItem->options : null;
+            $arrDetail['total_price'] = gp247_currency_value($product->getFinalPrice()) * $cartItem->qty;
+            $arrCartDetail[]          = $arrDetail;
+        }
+        
+        
+        // foreach ($dataCheckout as $cartItem) {
+
+        //     $arrDetail['product_id']  = $cartItem->id;
+        //     $arrDetail['name']        = $cartItem->name;
+        //     $arrDetail['price']       = gp247_currency_value($cartItem->price);
+        //     $arrDetail['qty']         = $cartItem->qty;
+        //     $arrDetail['store_id']    = $cartItem->storeId;
+        //     $arrDetail['attribute']   = is_object($cartItem->options) ? $cartItem->options->toArray() : (is_array($cartItem->options) ? $cartItem->options : null);
+        //     $arrDetail['total_price'] = gp247_currency_value($cartItem->price) * $cartItem->qty;
+        //     $arrCartDetail[]          = $arrDetail;
+        // }
+
+        //Set session info order
+        session(['dataOrder' => $dataOrder]);
+        session(['arrCartDetail' => $arrCartDetail]);
+
+        //Create new order
+        $newOrder = (new ShopOrder)->createOrder($dataOrder, $dataTotal, $arrCartDetail);
+
+        if ($newOrder['error'] == 1) {
+            sc_report($newOrder['msg']);
+            return redirect(gp247_route_front('cart'))->with(['error' => $newOrder['msg']]);
+        }
+        //Set session orderID
+        session(['orderID' => $newOrder['orderID']]);
+
+        //Create new address
+        if ($address_process == 'new') {
+            $addressNew = [
+                'first_name'      => $shippingAddress['first_name'] ?? '',
+                'last_name'       => $shippingAddress['last_name'] ?? '',
+                'first_name_kana' => $shippingAddress['first_name_kana'] ?? '',
+                'last_name_kana'  => $shippingAddress['last_name_kana'] ?? '',
+                'postcode'        => $shippingAddress['postcode'] ?? '',
+                'address1'        => $shippingAddress['address1'] ?? '',
+                'address2'        => $shippingAddress['address2'] ?? '',
+                'address3'        => $shippingAddress['address3'] ?? '',
+                'country'         => $shippingAddress['country'] ?? '',
+                'phone'           => $shippingAddress['phone'] ?? '',
+            ];
+
+            //Process escape
+            $addressNew = sc_clean($addressNew);
+
+            ShopCustomer::find($uID)->addresses()->save(new ShopCustomerAddress($addressNew));
+            session()->forget('address_process'); //destroy address_process
+        }
+        $paymentMethod = gp247_extension_get_namespace(type: 'Plugins', key: session('paymentMethod'));
+        $paymentMethod = $paymentMethod . '\Controllers\FrontController';
+        //Check class exist
+        if (class_exists($paymentMethod) && method_exists($paymentMethod, 'processOrder')) {
+            return (new $paymentMethod)->processOrder();
+        }else{
+            return (new ShopCartController)->completeOrderbuynow();
+        }
+    }
 
 }

@@ -50,7 +50,13 @@ class ShopOrderTotal extends Model
      */
     public static function processDataTotal(array $objects = [])
     {
-        $carts  = ShopCurrency::sumCartCheckout();
+         $carts  = ShopCurrency::sumCartCheckout();
+        if($carts['subTotal'] == 0)
+        {
+            $carts  = ShopCurrency::sumCartCheckoutBuyNow();
+        }
+        
+       
         $subtotal = $carts['subTotal'];
         $tax = $carts['subTotalWithTax'] - $carts['subTotal'];
 
@@ -309,5 +315,66 @@ class ShopOrderTotal extends Model
                 $model->{$model->getKeyName()} = gp247_generate_id();
             }
         });
+    }
+    
+     public static function processDataTotalBuyNow(array $objects = [])
+    {
+        $carts  = ShopCurrency::sumCartCheckoutBuyNow();
+        $subtotal = $carts['subTotal'];
+        $tax = $carts['subTotalWithTax'] - $carts['subTotal'];
+
+        //Set subtotal
+        $arraySubtotal = [
+            'title' => gp247_language_render('order.totals.sub_total'),
+            'code' => 'subtotal',
+            'value' => $subtotal,
+            'text' => gp247_currency_render_symbol($subtotal),
+            'sort' => self::POSITION_SUBTOTAL,
+        ];
+
+        //Set tax
+        $arrayTax = [
+            'title' => gp247_language_render('order.totals.tax'),
+            'code' => 'tax',
+            'value' => $tax,
+            'text' => gp247_currency_render_symbol($tax),
+            'sort' => self::POSITION_TAX,
+        ];
+
+        // set total value
+        $total = $subtotal + $tax;
+        foreach ($objects as $key => $object) {
+            if (is_array($object) && $object) {
+                if ($object['code'] != 'received') {
+                    $total += $object['value'];
+                }
+            } else {
+                unset($objects[$key]);
+            }
+        }
+
+        $arrayTotal = array(
+            'title' => gp247_language_render('order.totals.total'),
+            'code' => 'total',
+            'value' => $total,
+            'text' =>  gp247_currency_render_symbol($total),
+            'sort' => self::POSITION_TOTAL,
+        );
+        //End total value
+
+        $objects[] = $arraySubtotal;
+        $objects[] = $arrayTax;
+        $objects[] = $arrayTotal;
+
+        //re-sort item total
+        usort($objects, function ($a, $b) {
+            if ($a['sort'] > $b['sort']) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+
+        return $objects;
     }
 }

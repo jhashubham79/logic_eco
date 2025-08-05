@@ -11,6 +11,14 @@ $layout_page = shop_checkout
 - $products: paginate
 Use paginate: $products->appends(request()->except(['page','_token']))->links()
 */
+
+$action_url = 'order.add';
+$current_url = url()->current(); 
+
+$count = count(explode('/',$current_url));
+if (explode('/',$current_url)[$count-1] == "buynow") {
+    $action_url = 'order.add.buynow';
+}
 @endphp
 
 @extends($GP247TemplatePath.'.layout')
@@ -33,7 +41,7 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
             {{-- //Item cart detail --}}
 
             <div class="col-12">
-                <form class="gp247-shipping-address" id="form-order" role="form" method="POST" action="{{ gp247_route_front('order.add') }}">
+                <form class="gp247-shipping-address" id="form-order" role="form" method="POST" action="{{ gp247_route_front($action_url) }}">
                     {{-- Required csrf for secirity --}}
                     @csrf
                     {{--// Required csrf for secirity --}}

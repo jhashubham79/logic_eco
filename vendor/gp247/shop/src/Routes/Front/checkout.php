@@ -35,9 +35,24 @@ Route::group(
         //Add order
         $router->post('/order-add', $nameSpaceFrontCart.'\ShopCartController@addOrder')
             ->name('order.add');
+            
+             $router->post('/order-add-buynow', $nameSpaceFrontCart.'\ShopCartController@addOrderBuyNow')
+        ->name('order.add.buynow');   
 
         //Order success
         $router->get($prefixOrderSuccess.$suffix, $nameSpaceFrontCart.'\ShopCartController@orderSuccessProcessFront')
             ->name('order.success');
+            
+            
+            
+            $router->get($prefixCartCheckout.'/buynow'.$suffix, $nameSpaceFrontCart.'\ShopCartController@getCheckoutFrontBuyNow')
+        ->name('checkout.buynow');    
+
+        $router->post('/checkout-process-buynow', $nameSpaceFrontCart.'\ShopCartController@processCheckoutBuyNow')
+            ->name('checkout.lastbuynow');
+        $router->get($prefixCartCheckoutConfirm.'/buynow'.$suffix, $nameSpaceFrontCart.'\ShopCartController@getCheckoutConfirmFrontBuyNow')
+        ->name('checkout.confirm.buynow');
+           
+            
     }
 );

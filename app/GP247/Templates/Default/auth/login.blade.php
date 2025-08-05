@@ -1,65 +1,89 @@
 @extends($GP247TemplatePath.'.layout')
 
 @section('block_main')
-<!--form-->
-<section class="section section-sm section-first bg-default text-md-left">
+
+@php
+    $activeTab = "login";
+@endphp
+
+<div class="signup py-5">
     <div class="container">
-    <div class="row">
-        <div class="col-12 col-sm-12">
-            <h2>{{ gp247_language_render('customer.title_login') }}</h2>
-            <form action="{{ gp247_route_front('customer.postLogin') }}" method="post" class="box">
-                {!! csrf_field() !!}
-                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                    <label for="email" class="control-label">{{ gp247_language_render('customer.email') }}</label>
-                    <input class="is_required validate account_input form-control {{ ($errors->has('email'))?"input-error":"" }}"
-                        type="text" name="email" value="{{ old('email') }}">
-                    @if ($errors->has('email'))
-                    <span class="help-block">
-                        {{ $errors->first('email') }}
-                    </span>
-                    @endif
+        <div class="signup-bg">
+            <div class="signup-tabs text-center">
+                <ul class="nav d-inline-flex rounded shadow p-2 nav-pills mb-3" id="signup-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                       <a href="{{ gp247_route_front('customer.register') }}"
+                            class="nav-link">
+                            Sign Up
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $activeTab === 'login' ? 'active' : '' }}" id="s2-tab"
+                            data-bs-toggle="pill" data-bs-target="#s2" type="button" role="tab"
+                            aria-controls="s2" aria-selected="{{ $activeTab === 'login' ? 'true' : 'false' }}">
+                            Login
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="signup-tabContent">
+                    {{-- Sign Up Tab --}}
+                  
+                    {{-- Login Tab --}}
+                    <div class="tab-pane fade {{ $activeTab === 'login' ? 'show active' : '' }}" id="s2"
+                        role="tabpanel" aria-labelledby="s2-tab" tabindex="0">
+                        <div class="text-center mt-4">
+                            <h2 class="heading2">Welcome back!</h2>
+                            <p class="tagline2">Please enter your details.</p>
+                        </div>
+                        <div class="form-fields text-start">
+                            <div class="row justify-content-center">
+                                <div class="col-md-5 col-lg-4">
+                                    <form action="{{ route('customer.postLogin') }}" method="POST" class="p-4">
+                                        @csrf
+                                        <input type="hidden" name="active_tab" value="login">
+
+                                        {{-- Email --}}
+                                        <div class="mb-3">
+                                            
+                                            <input type="email" name="email" placeholder="{{ gp247_language_render('customer.email') }}" class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                                value="{{ old('email') }}" required>
+                                            @error('email')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Password --}}
+                                        <div class="mb-3">
+                                           
+                                            <input type="password" name="password" placeholder="{{ gp247_language_render('customer.password') }}" class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                                required>
+                                            @error('password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        {{-- Remember Me + Forgot --}}
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                                                <label class="form-check-label fw-semibold" for="remember">Remember me</label>
+                                            </div>
+                                            <div>
+                                                <a href="{{ route('customer.forgot') }}" class="text-dark text-decoration-none fw-semibold">Forgot Password?</a>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn custom-btn w-100">Login</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end tab content -->
                 </div>
-                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label for="password" class="control-label">{{ gp247_language_render('customer.password') }}</label>
-                    <input class="is_required validate account_input form-control {{ ($errors->has('password'))?"input-error":"" }}"
-                        type="password" name="password" value="">
-                    @if ($errors->has('password'))
-                    <span class="help-block">
-                        {{ $errors->first('password') }}
-                    </span>
-                    @endif
-            
-                </div>
-                @if (!empty(gp247_config('LoginSocialite')))
-                    <ul>
-                    <li class="rd-dropdown-item">
-                      <a class="rd-dropdown-link" href="{{ gp247_route_front('login_socialite.index', ['provider' => 'facebook']) }}"><i class="fab fa-facebook"></i>
-                         {{ gp247_language_render('front.login') }} facebook</a>
-                    </li>
-                    <li class="rd-dropdown-item">
-                      <a class="rd-dropdown-link" href="{{ gp247_route_front('login_socialite.index', ['provider' => 'google']) }}"><i class="fab fa-google-plus"></i>
-                         {{ gp247_language_render('front.login') }} google</a>
-                    </li>
-                    <li class="rd-dropdown-item">
-                      <a class="rd-dropdown-link" href="{{ gp247_route_front('login_socialite.index', ['provider' => 'github']) }}"><i class="fab fa-github"></i>
-                         {{ gp247_language_render('front.login') }} github</a>
-                    </li>
-                    </ul>
-                @endif
-                <p class="lost_password form-group">
-                    <a class="btn btn-link" href="{{ gp247_route_front('customer.forgot') }}">
-                        {{ gp247_language_render('customer.password_forgot') }}
-                    </a>
-                    <br>
-                    <a class="btn btn-link" href="{{ gp247_route_front('customer.register') }}">
-                        {{ gp247_language_render('customer.title_register') }}
-                    </a>
-                </p>
-                <button class="button button-secondary" type="submit" id="">{{ gp247_language_render('front.login') }}</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-</section>
-<!--/form-->
+
 @endsection

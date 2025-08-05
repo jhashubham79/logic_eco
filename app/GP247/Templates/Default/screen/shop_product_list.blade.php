@@ -53,7 +53,7 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
           <div class="col-6 col-md-6 col-lg-3">
             <div class="feature-box p-4 h-100">
               @if ($image)
-                <img src="{{ asset($image) }}" alt="" class="img-fluid mb-2">
+                <img src="{{ asset($image) }}" alt="image" class="img-fluid mb-2">
               @endif
               <h6>{{ $name }}</h6>
               <p class="text-muted mb-0">{{ $content }}</p>
@@ -167,59 +167,63 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
       </div>
       <div class="col-12">
         <div class="simple-border">
-          <div class="row pd-40 mgap">
-            <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">
-              <div class="stepBox">
-                <img src="{{url('images/3 (2).png')}}" class="step-icon" alt="Step 1">
-              <div class="steptxt">
-                <p  class="steps">STEP 1</p>
-                <h5>Choose Your Fix</h5>
-                <p class="status">Completed</p>
-              </div>
-               <div class="arrow-image1 d-none d-md-block d-lg-block" ><svg xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
-               <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
-               </svg></div>
-               <div class="mobile_arrow1 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
-                    <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
-                    </svg></div>
-              </div>
-            </div>
-            </div>
-
-             <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">               
-                <div class="stepBox">
-                   <img src="{{url('images/3 (3).png')}}" class="step-icon" alt="Step 1">
-                   <div class="steptxt">
-                    <p  class="steps">STEP 2</p>
-                    <h5>Submit Your Details</h5>
-                    <p class="status">Completed</p>
-                   </div>                  
-                  <div class="arrow-image2 d-none d-md-block d-lg-block" ><svg xmlns="http://www.w3.org/2000/svg" width="268" height="4"    viewBox="0 0 268 4" fill="none">
-                  <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round"/>
-                  </svg></div>
-                    <div class="mobile_arrow2 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48" viewBox="0 0 3 48" fill="none">
-                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round"/>
-                        </svg></div>
+            <div class="row pd-40 mgap">
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step1.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 1</p>
+                      <h5>Choose Your Fix</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                    <div class="arrow-image1 d-none d-md-block d-lg-block"><svg class="custom-arrow-svg"
+                        xmlns="http://www.w3.org/2000/svg" width="268" height="4" viewBox="0 0 268 4" fill="none">
+                        <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round" />
+                      </svg></div>
+                    <div class="mobile_arrow1 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48"
+                        viewBox="0 0 3 48" fill="none">
+                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round" />
+                      </svg></div>
+                  </div>
                 </div>
-            </div>
-            </div>
+              </div>
 
-             <div class="col-md-4 col-sm-12">
-              <div class="step-item stepBoxWrap">                
-              <div class="stepBox">
-                <img src="{{url('images/3 (1).png')}}" class="step-icon" alt="Step 1">
-                <div class="steptxt">
-                  <p  class="steps">STEP 3</p>
-                  <h5>Consider It Done</h5>
-                  <p class="status">Completed</p> 
-                </div>                
-              </div>          
-            </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step2.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 2</p>
+                      <h5>Submit Your Details</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                    <div class="arrow-image2 d-none d-md-block d-lg-block"><svg class="custom-arrow-svg"
+                        xmlns="http://www.w3.org/2000/svg" width="268" height="4" viewBox="0 0 268 4" fill="none">
+                        <path d="M2 2H266" stroke="#008C76" stroke-width="4" stroke-linecap="round" />
+                      </svg></div>
+                    <div class="mobile_arrow2 d-md-none"><svg xmlns="http://www.w3.org/2000/svg" width="3" height="48"
+                        viewBox="0 0 3 48" fill="none">
+                        <path d="M1.5 1L1.5 47" stroke="#008C76" stroke-width="2" stroke-linecap="round" />
+                      </svg></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-12">
+                <div class="step-item stepBoxWrap">
+                  <div class="stepBox">
+                    <img src="{{url('images/step3.webp')}}" class="step-icon" alt="Step 1">
+                    <div class="steptxt">
+                      <p class="steps">STEP 3</p>
+                      <h5>Consider It Done</h5>
+                      <p class="status">Completed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>
@@ -228,50 +232,51 @@ Use paginate: $products->appends(request()->except(['page','_token']))->links()
 
  <!-- formsection -->
 
-<section class="custom-contact-section">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-12">
-        <div class=" custom-contact-bg d-flex align-items-center justify-content-center" style="background-image: url(/images/Rectangle.png); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
-           <div class="row w-100 align-items-center">
-    <div class="col-md-6 col-sm-12 text-white">
-      <div class="contact-form-heading">
-                 <h3 >Have a Different Problem?</h3>
-                        <p >
-                         If you don’t see the exact service you need, don’t worry.
-                         We can likely create a custom fix for you. Get in touch for a
-                        bespoke quote from our experts.
-                        </p>
+<section class="custom-contact-section mb-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-12">
+          <div class=" custom-contact-bg d-flex align-items-center justify-content-center"
+            style="background-image: url(/images/rectangle.webp); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px;  padding: 30px;">
+            <div class="row w-100 align-items-center">
+              <div class="col-md-6 col-sm-12 text-white">
+                <div class="contact-form-heading">
+                  <h3>Have a Different Problem?</h3>
+                  <p>
+                    If you don’t see the exact service you need, don’t worry.
+                    We can likely create a custom fix for you. Get in touch for a
+                    bespoke quote from our experts.
+                  </p>
 
+                </div>
+              </div>
+              <div class="col-md-6 ">
+                <form>
+                  <div class="row g-2">
+                    <div class="col-md-6 col-sm-12">
+                      <input type="text" class="form-control" placeholder="Full Name" required />
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      <input type="text" class="form-control" placeholder="Email or Phone number" required />
+                    </div>
+                    <div class="col-12">
+                      <textarea class="form-control" placeholder="Write..." rows="3" required></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                      <button type="submit" class="btn btn-pink mt-2">Submit</button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
-            <div class="col-md-6 ">
-        <form>
-          <div class="row g-2">
-            <div class="col-md-6 col-sm-12">
-              <input type="text" class="form-control" placeholder="Full Name" required />
-            </div>
-            <div class="col-md-6 col-sm-12">
-              <input type="text" class="form-control" placeholder="Email or Phone number" required />
-            </div>
-            <div class="col-12">
-              <textarea class="form-control" placeholder="Write..." rows="3" required></textarea>
-            </div>
-            <div class="col-12 text-end">
-              <button type="submit" class="btn btn-pink mt-2">Submit</button>
-            </div>
           </div>
-        </form>
-      </div>
-           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
 
-<!-- Fanq -->
+<!-- Faq -->
 <section class="faq-section py-5">
   <div class="container">
     <h2 class="text-center mb-4">FAQs ?</h2>

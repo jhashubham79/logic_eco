@@ -39,7 +39,7 @@ $home = DB::table('gp247_front_page_description')
 <div class="col-12">
   <div class="card-box">
     <div class="card-box-img">
-      <img src="images/Group 35595.svg" alt="">
+      <img src="{{url('images/icon-r.svg')}}" alt="">
     </div>
        <div class="card-grid-scrollable" >
     <div class="row g-4 ">

@@ -267,4 +267,32 @@ class ShopCurrency extends Model
             }
         });
     }
+    
+     public static function sumCartCheckoutBuyNow(float $rate = null)
+    {
+         $dataCheckout = session('cart.buynow') ?? [];
+        $rate = ($rate) ? $rate : self::$exchange_rate;
+        $dataReturn = [];
+        $sumSubtotal  = 0;
+        $sumSubtotalWithTax  = 0;
+        foreach ($dataCheckout as $item) {
+            $product = (new ShopProduct)->getDetail(key:$item->id, type:'id', storeId: $item->storeId);
+            if($product) {
+                $priceItem = $product->getFinalPrice();
+                $priceItem += gp247_cart_options_price($item->options);
+                $sumValue = $item->qty * self::getValue($priceItem, $rate);
+                $sumValueWithTax = $item->qty * self::getValue(gp247_tax_price($priceItem, $product->getTaxValue()), $rate);
+                $sumSubtotal += $sumValue;
+                $sumSubtotalWithTax +=  $sumValueWithTax;
+            }
+        }
+        $dataReturn['subTotal'] = $sumSubtotal;
+        $dataReturn['subTotalWithTax'] = $sumSubtotalWithTax;
+        return $dataReturn;
+        
+        
+        
+        
+       
+    }
 }
