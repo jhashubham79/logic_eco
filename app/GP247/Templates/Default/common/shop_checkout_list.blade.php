@@ -2,8 +2,9 @@
     $dataCartProcess = gp247_cart_process_data($cartItem);
 @endphp
 <div class="col-md-12">
+ <div class="my-orders checkout-cart bg-white mb-5">
   <div class="table-responsive">
-      <table class="table box table-bordered">
+      <table class="table box">
           <thead>
               <tr style="background: #eaebec">
                   <th>{{ gp247_language_render('product.name') }}</th>
@@ -52,6 +53,7 @@
           </tbody>
       </table>
   </div>
+ </div>
 </div>
 
 

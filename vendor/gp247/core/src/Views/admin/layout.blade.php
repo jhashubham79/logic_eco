@@ -23,6 +23,7 @@
   <!-- iCheck -->
   <link rel="stylesheet" href="{{ gp247_file('GP247/Core/LTE/plugins/iCheck/square/blue.css')}}">
   <link rel="stylesheet" href="{{ gp247_file('GP247/Core/LTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css')}}">
+  <link rel="stylesheet" href="{{ url('GP247/Templates/Default/css/customAdmin.css')}}">
   <!-- Select2 -->
   <link rel="stylesheet" href="{{ gp247_file('GP247/Core/LTE/plugins/select2/css/select2.min.css')}}">
   <!-- Daterange picker -->

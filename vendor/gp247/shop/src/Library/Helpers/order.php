@@ -134,9 +134,9 @@ if (!function_exists('gp247_order_mapping_validate') && !in_array('gp247_order_m
 
         if (gp247_config('customer_phone')) {
             if (gp247_config('customer_phone_required')) {
-                $validate['phone'] = config('validation.customer.phone_required', 'required|regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_required', 'required');
             } else {
-                $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_null', 'nullable');
             }
         }
         if (gp247_config('customer_country')) {
@@ -187,7 +187,7 @@ if (!function_exists('gp247_order_mapping_validate') && !in_array('gp247_order_m
             'sex.required'            => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('cart.sex')]),
             'birthday.required'       => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('cart.birthday')]),
             'email.email'             => gp247_language_render('validation.email', ['attribute'=> gp247_language_render('cart.email')]),
-            'phone.regex'             => gp247_language_render('customer.phone_regex'),
+              'phone'         => 'Phone is Required',
             'postcode.min'            => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('cart.postcode')]),
             'country.min'             => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('cart.country')]),
             'first_name.max'          => gp247_language_render('validation.max', ['attribute'=> gp247_language_render('cart.first_name')]),

@@ -62,7 +62,7 @@
                                                 <div class="mb-3">
                                                     <input type="text" name="first_name" placeholder="{{ gp247_language_render('customer.name') }}"
                                                         class="form-control form-control-lg {{ $errors->has('first_name') ? 'is-invalid' : '' }}"
-                                                        value="{{ old('first_name') }}">
+                                                        value="{{ old('first_name') }}" >
                                                     @error('first_name')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -113,7 +113,7 @@
                                             {{-- Password --}}
                                             <div class="mb-3">
                                                 <input type="password" name="password" placeholder="{{ gp247_language_render('customer.password') }}"
-                                                    class="form-control form-control-lg {{ $errors->has('password') ? 'is-invalid' : '' }}">
+                                                    class="is_required validate account_input  form-control form-control-lg {{ $errors->has('password') ? 'is-invalid' : '' }}" >
                                                 @error('password')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -121,7 +121,7 @@
 
                                             <div class="mb-3">
                                                 <input type="password" name="password_confirmation" placeholder="{{ gp247_language_render('customer.password_confirm') }}"
-                                                    class="form-control form-control-lg {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}">
+                                                    class="is_required validate account_input form-control form-control-lg {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}" >
                                                 @error('password_confirmation')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -187,5 +187,63 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('gp247-form-process');
+
+    form.addEventListener('submit', function (e) {
+        let valid = true;
+
+        // Clear all previous errors
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        form.querySelectorAll('.invalid-feedback.js-error').forEach(el => el.remove());
+
+        // Fields to validate
+        const requiredFields = [
+            'first_name',
+            'email',
+            'password',
+            'password_confirmation'
+        ];
+
+        // Validate required fields
+        requiredFields.forEach(name => {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (input && input.value.trim() === '') {
+                valid = false;
+                showError(input, 'This field is required.');
+            }
+        });
+
+        // Password match validation
+        const password = form.querySelector('[name="password"]');
+        const confirmPassword = form.querySelector('[name="password_confirmation"]');
+
+        if (password && confirmPassword && password.value !== confirmPassword.value) {
+            valid = false;
+            showError(confirmPassword, 'Passwords do not match.');
+        }
+
+        if (!valid) {
+            e.preventDefault(); // Prevent form submission
+        }
+    });
+
+    function showError(input, message) {
+        input.classList.add('is-invalid');
+
+        const error = document.createElement('div');
+        error.className = 'invalid-feedback js-error';
+        error.textContent = message;
+
+        // Append error after input
+        input.parentNode.appendChild(error);
+    }
+});
+</script>
+
+
 
 @endsection

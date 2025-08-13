@@ -34,6 +34,9 @@ Route::group(
             $router->get('invoice/{id}', $nameSpaceFrontCustomer.'\ShopAccountController@invoice')
             ->name('customer.invoice');
             
+             $router->get('active-service', $nameSpaceFrontCustomer.'\ShopAccountController@activeservice')
+            ->name('customer.activeservice');
+            
            
             
             

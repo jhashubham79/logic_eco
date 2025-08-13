@@ -552,4 +552,31 @@ class ShopAccountController extends RootFrontController
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
     }
+    
+    public function activeservice()
+    {
+        
+        $customer = customer()->user();
+        $statusOrder = ShopOrderStatus::getIdAll();
+        $subPath = 'account.activestatus';
+        $view = gp247_shop_process_view($this->GP247TemplatePath,$subPath);
+        gp247_check_view($view);
+        return view($view)
+            ->with(
+                [
+                'title'       => 'Active Status',
+                'statusOrder' => $statusOrder,
+                'orders'      => (new ShopOrder)->profile()->getData(),
+                'customer'    => $customer,
+                'layout_page' => 'shop_profile',
+                'breadcrumbs' => [
+                    ['url'    => gp247_route_front('customer.index'), 'title' => gp247_language_render('customer.my_profile')],
+                    ['url'    => '', 'title' => gp247_language_render('customer.order_history')],
+                ],
+                ]
+            );
+        
+        
+    }
+    
 }

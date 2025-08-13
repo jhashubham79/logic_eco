@@ -44,23 +44,36 @@ $layout_page = shop_product_detail
              <div class="product-section-btn">
                 <p><span class="font-weight-bold">${{ $product->price }}</span> / One-Time Fix</p>
                 
+                  
+           @if ($product->allowSale() && gp247_config('product_use_button_add_to_cart'))
+    <button 
+        type="button" 
+        onclick="addToCartAjax('{{ $product->id }}','default','{{ $product->store_id }}')" 
+        class="btn-products">
+        {{ gp247_language_render('action.add_to_cart') }}
+    </button>
+@endif
+
                 
-                 <form id="buy_block" class="product-information" action="{{ gp247_route_front('cart.add') }}" method="post">
-              {{ csrf_field() }}
-              <input type="hidden" name="product_id" id="product-detail-id" value="{{ $product->id }}" />
-              <input type="hidden" name="storeId" id="product-detail-storeId" value="{{ $product->store_id }}" />
+            <!--     <form id="buy_block" class="product-information" action="{{ gp247_route_front('cart.add') }}" method="post">-->
+            <!--  {{ csrf_field() }}-->
+            <!--  <input type="hidden" name="product_id" id="product-detail-id" value="{{ $product->id }}" />-->
+            <!--  <input type="hidden" name="storeId" id="product-detail-storeId" value="{{ $product->store_id }}" />-->
              
                 
-                {{-- Button add to cart --}}
-                @if ($product->kind != GP247_PRODUCT_GROUP && $product->allowSale() && gp247_config('product_use_button_add_to_cart'))
+            <!--    {{-- Button add to cart --}}-->
+            <!--    @if ($product->kind != GP247_PRODUCT_GROUP && $product->allowSale() && gp247_config('product_use_button_add_to_cart'))-->
                
-                      <input class="form-input" name="qty" type="hidden" data-zeros="true" value="1" min="1" max="100">
+            <!--          <input class="form-input" name="qty" type="hidden" data-zeros="true" value="1" min="1" max="100">-->
                     
-                      <button class="btn-products" type="submit" id="gp247-button-process">{{ gp247_language_render('action.add_to_cart') }}</button>
+            <!--          <button class="btn-products" type="submit" id="gp247-button-process">{{ gp247_language_render('action.add_to_cart') }}</button>-->
                     
-                @endif
+            <!--    @endif-->
               
-            </form>
+            <!--</form>-->
+            
+            <br>
+          
                 
                 <br>
                 
@@ -155,7 +168,7 @@ $layout_page = shop_product_detail
           @if (!empty($item))
             <div class="whatyougot-content">
               <div class="whatyougoticon">
-                <img src="/images/whatyougeticonimg.png" class="img-fluid" alt="">
+                <img src="{{url('images/whatyougeticonimg.webp')}}" class="img-fluid" alt="">
               </div>
               <div><p>{{ $item }}</p></div>
             </div>
@@ -213,22 +226,7 @@ $layout_page = shop_product_detail
 
 
 
-
-
-
-<!-- Related Product Section -->
-<section class="price-section-product py-5">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col--10 col-sm-12">
-        <div class="price-section text-center"> 
-          <h2>Enhance Your Solution</h2>
-          <p>
-            Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.
-          </p>
-        </div>
-
-     @php
+ @php
     use Illuminate\Support\Facades\DB;
 
     // Main product price
@@ -257,7 +255,22 @@ $layout_page = shop_product_detail
         ->get();
 @endphp
 
+
 @if($relatedProducts->count())
+<!-- Related Product Section -->
+<section class="price-section-product py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col--10 col-sm-12">
+        <div class="price-section text-center"> 
+          <h2>Enhance Your Solution</h2>
+          <p>
+            Here's a look at the types of urgent problems we solve. Each category represents a core area where small businesses often face roadblocks. Hover over any card to see examples of specific fixes, helping you quickly identify the right solution.
+          </p>
+        </div>
+
+    
+
 
 <form id="multi-add-to-cart" action="{{ gp247_route_front('cart.multi_add') }}" method="POST">
   @csrf
@@ -320,14 +333,14 @@ $layout_page = shop_product_detail
       <div class="product-total fs-5">Total: <span class="total price">$0.00</span></div>
     </div>
     <button type="submit" class="product-price-btn">
-      Buy  
+      Add to cart  
     </button>
   </div>
   </div>
 </div>
 </div>
 </form>
-@endif
+
 
 
       </div>
@@ -335,7 +348,7 @@ $layout_page = shop_product_detail
   </div>
 </section>
 
-
+@endif
 
  <!-- simple step  -->
 
@@ -516,6 +529,9 @@ $layout_page = shop_product_detail
 @endpush
 
 @push('scripts')
+
+
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const checkboxes = document.querySelectorAll('.product-checkbox');
@@ -570,4 +586,14 @@ $layout_page = shop_product_detail
 
 
 @endpush
+
+@pushOnce('scripts')
+      <!-- Render include js cart -->
+      @php
+          $view = gp247_shop_process_view($GP247TemplatePath, 'common.shop_js');
+      @endphp
+      @include($view)
+      <!--// Render include js cart -->
+@endPushOnce
+
 

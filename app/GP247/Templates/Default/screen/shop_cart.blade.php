@@ -11,10 +11,19 @@ $layout_page = shop_cart
 @extends($GP247TemplatePath.'.layout')
 
 @section('block_main')
-<section class="section section-xl bg-default text-md-left">
-    <div class="container">
-        <div class="row">
-            @if (count($cart) ==0)
+
+
+
+<section class="cart py-5">
+        <div class="container">
+             <h1 class="mb-4 text-center">Cart</h1>
+             <div class="row g-4 justify-content-center">
+                 <div class="col-lg-10">
+             <div class="my-orders bg-white">
+            <div class="row g-4 justify-content-center">
+                
+                
+                 @if (count($cart) ==0)
 
             <div class="col-md-12">
                 {!! gp247_language_render('cart.cart_empty') !!}!
@@ -24,15 +33,13 @@ $layout_page = shop_cart
             @php
                 $cartTmp = $cart->groupBy('storeId');
             @endphp
-
-            {{-- Render cart item for earch shop --}}
-            @foreach ($cartTmp as $sId => $cartItem)
-            <div class="col-md-12">
-                <h5><i class="fa fa-shopping-bag" aria-hidden="true"></i>  {{ gp247_store_info(key: 'title', storeId: $sId) }}</h5>
-            </div>
-
-            <div class="col-md-12">
-                <form action="{{ gp247_route_front('checkout.prepare') }}" method="POST">
+                
+                <div class="col-lg-12">
+                    
+                        
+                        @foreach ($cartTmp as $sId => $cartItem)
+                        
+                        <form action="{{ gp247_route_front('checkout.prepare') }}" method="POST">
                     <input type="hidden" name="store_id" value="{{ $sId }}">
                     @csrf
 
@@ -44,20 +51,43 @@ $layout_page = shop_cart
                     {{-- //Item cart detail --}}
                     
                     {{-- Button checkout --}}
-                    <div class="col-md-12 text-center">
+                   
                         <div class="pull-right">
-                            <button class="button button-secondary" type="submit" id="">{{ gp247_language_render('cart.checkout') }}</button>
+                              
+                              
+                             <button class="btn custom-btn   cart-checkout-button text-center text-md-end" type="submit">
+                            Checkout <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                            
+                            <!--<button class="button button-secondary" type="submit" id="">{{ gp247_language_render('cart.checkout') }}</button>-->
                         </div>
-                    </div>
+                    
                     {{-- Button checkout --}}
                 </form>
-            </div>
-            @endforeach
+                        @endforeach
             {{--// Render cart item for earch shop --}}
-            @endif
+           
+                        
+                    
+                </div>
+</div>
+                <!-- Order Summary -->
+                 @endif
+            </div>
         </div>
-    </div>
-</section>
+        </div>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
 @endsection
 
 @push('styles')

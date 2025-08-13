@@ -1053,15 +1053,17 @@ foreach ($descriptions as $code => $row) {
 
  
  
-   $relatedProducts = $data['related_products'];
-//dd($data,$id,$relatedProducts);
-    // Remove existing related records (both directions)
-    DB::table('related_product')
-        ->where('product_id', $id)
-        ->orWhere('related_product_id', $id)
-        ->delete();
+  // Get related products from request safely
+$relatedProducts = $data['related_products'] ?? [];
 
-    // Insert new relationships in both directions
+// Remove existing related records (both directions)
+DB::table('related_product')
+    ->where('product_id', $id)
+    ->orWhere('related_product_id', $id)
+    ->delete();
+
+// Only insert if we actually have related products
+if (!empty($relatedProducts) && is_array($relatedProducts)) {
     foreach ($relatedProducts as $relatedId) {
         if ($relatedId == $id) {
             continue; // prevent self-relation
@@ -1079,6 +1081,8 @@ foreach ($descriptions as $code => $row) {
             'related_product_id' => $id
         ]);
     }
+}
+
 
 
             $product->categories()->detach();

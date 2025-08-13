@@ -2,11 +2,15 @@
     $dataCartProcess = gp247_cart_process_data($cartItem);
 @endphp
 <div class="col-md-12">
+    
+    
+                  
+    
   <div class="table-responsive">
-      <table class="table box table-bordered">
+      <table class="table box">
           <thead>
               <tr style="background: #eaebec">
-                  <th>{{ gp247_language_render('product.name') }}</th>
+                  <th class="ps-md-4">{{ gp247_language_render('product.name') }}</th>
                   <th>{{ gp247_language_render('product.price') }}</th>
                   <th>{{ gp247_language_render('product.quantity') }}</th>
                   <th>{{ gp247_language_render('product.subtotal') }}</th>
@@ -70,6 +74,7 @@
       </table>
   </div>
 </div>
+
 
 
 @push('scripts')

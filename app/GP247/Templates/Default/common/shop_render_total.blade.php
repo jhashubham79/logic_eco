@@ -1,5 +1,6 @@
 @if (!empty($dataTotal) && count($dataTotal))
-<table class="table box table-bordered" id="gp247_showTotal">
+<div class="px-md-5 py-md-3">
+<table class="table box mb-5" id="gp247_showTotal">
     @foreach ($dataTotal as $key => $element)
         @if ($element['code']=='total')
             <tr class="gp247_showTotal" style="background:#f5f3f3;font-weight: bold;">
@@ -18,4 +19,5 @@
         @endif
     @endforeach
 </table>
+</div>
 @endif

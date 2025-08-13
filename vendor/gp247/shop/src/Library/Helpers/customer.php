@@ -132,7 +132,8 @@ if (!function_exists('gp247_customer_address_mapping') && !in_array('gp247_custo
             $dataAddress['address3'] = $dataRaw['address3']??'';
         }
         if (gp247_config('customer_phone')) {
-            $validate['phone'] = config('validation.customer.phone_required', 'required|regex:/^0[^0][0-9\-]{6,12}$/');
+            $validate['phone'] = config('validation.customer.phone_required', 'required');
+
             $dataAddress['phone'] = $dataRaw['phone']??'';
         }
         if (gp247_config('customer_country')) {
@@ -153,7 +154,7 @@ if (!function_exists('gp247_customer_address_mapping') && !in_array('gp247_custo
             'phone.required'      => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.phone')]),
             'country.required'    => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.country')]),
             'postcode.required'   => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.postcode')]),
-            'phone.regex'         => gp247_language_render('customer.phone_regex'),
+            'phone.regex'         => 'Phone is Required',
             'postcode.min'        => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.postcode')]),
             'country.min'         => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.country')]),
             'first_name.max'      => gp247_language_render('validation.max', ['attribute'=> gp247_language_render('customer.first_name')]),
@@ -256,9 +257,9 @@ if (!function_exists('gp247_customer_data_insert_mapping') && !in_array('gp247_c
 
         if (gp247_config('customer_phone')) {
             if (gp247_config('customer_phone_required')) {
-                $validate['phone'] = config('validation.customer.phone_required', 'regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_required');
             } else {
-                $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_null', 'nullable');
             }
             if (!empty($dataRaw['phone'])) {
                 $dataInsert['phone'] = $dataRaw['phone'];
@@ -367,7 +368,7 @@ if (!function_exists('gp247_customer_data_insert_mapping') && !in_array('gp247_c
             'sex.required'         => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.sex')]),
             'birthday.required'    => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.birthday')]),
             'email.email'          => gp247_language_render('validation.email', ['attribute'=> gp247_language_render('customer.email')]),
-            'phone.regex'          => gp247_language_render('customer.phone_regex'),
+             'phone.regex'         => 'Phone is Required',
             'password.confirmed'   => gp247_language_render('validation.confirmed', ['attribute'=> gp247_language_render('customer.password')]),
             'postcode.min'         => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.postcode')]),
             'country.min'          => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.country')]),
@@ -483,9 +484,9 @@ if (!function_exists('gp247_customer_data_edit_mapping') && !in_array('gp247_cus
 
         if (gp247_config('customer_phone')) {
             if (gp247_config('customer_phone_required')) {
-                $validate['phone'] = config('validation.customer.phone_required', 'regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_required');
             } else {
-                $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^0[^0][0-9\-]{6,12}$/');
+                $validate['phone'] = config('validation.customer.phone_null', 'nullable');
             }
             if (!empty($dataRaw['phone'])) {
                 $dataUpdate['phone'] = $dataRaw['phone'];
@@ -586,7 +587,7 @@ if (!function_exists('gp247_customer_data_edit_mapping') && !in_array('gp247_cus
             'sex.required'         => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.sex')]),
             'birthday.required'    => gp247_language_render('validation.required', ['attribute'=> gp247_language_render('customer.birthday')]),
             'email.email'          => gp247_language_render('validation.email', ['attribute'=> gp247_language_render('customer.email')]),
-            'phone.regex'          => gp247_language_render('customer.phone_regex'),
+            'phone.regex'         => 'Phone is Required',
             'password.confirmed'   => gp247_language_render('validation.confirmed', ['attribute'=> gp247_language_render('customer.password')]),
             'postcode.min'         => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.postcode')]),
             'country.min'          => gp247_language_render('validation.min', ['attribute'=> gp247_language_render('customer.country')]),

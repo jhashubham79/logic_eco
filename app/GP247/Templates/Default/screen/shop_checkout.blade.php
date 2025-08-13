@@ -26,7 +26,7 @@ $layout_page = shop_checkout
 
 
 @section('block_main')
-<section class="section section-xl bg-default text-md-left">
+<section class="section section-xl bg-default text-md-left shop-checkout cart">
     <div class="container">
         <div class="row">
             @if (count($cartItem) ==0)
@@ -35,7 +35,7 @@ $layout_page = shop_checkout
             </div>
             @else
             <div class="col-12">
-                <h5><i class="fa fa-shopping-bag" aria-hidden="true"></i>  {{ gp247_store_info(key: 'title', storeId: $storeCheckout) }}</h5>
+                <h1 class="h3 my-5 text-center"><i class="fa fa-shopping-bag" aria-hidden="true"></i>  {{ gp247_store_info(key: 'title', storeId: $storeCheckout) }}</h1>
             </div>
 
             {{-- Item cart detail --}}
@@ -47,7 +47,8 @@ $layout_page = shop_checkout
 
 
             <div class="col-md-12">
-            <form class="gp247-shipping-address" id="gp247-form-process" role="form" method="POST" action="{{ gp247_route_front($action_url) }}">
+              <div class="my-orders bg-white mb-4">
+                <form class="gp247-shipping-address checkout-form" id="gp247-form-process" role="form" method="POST" action="{{ gp247_route_front($action_url) }}">
                 @csrf
                 <div class="row">
                     {{-- Begin address shipping --}}
@@ -159,6 +160,20 @@ $layout_page = shop_checkout
                                     </td>
                                 @endif
                             </tr>
+                            
+                            
+                            <tr>
+                                <td colspan="2" class="form-group">
+                                    <div class="create-account">
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox" id="createAccount" name="create_account" value="1">
+                                          <label class="form-check-label" for="createAccount">
+                                            Create an account?
+                                          </label>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
 
 
                             @if (gp247_config('customer_country'))
@@ -267,6 +282,15 @@ $layout_page = shop_checkout
 
                         </table>
                         {{-- //Render address shipping --}}
+                        
+                        <!--<div class="create-account">-->
+                        <!--    <div class="form-check">-->
+                        <!--      <input class="form-check-input" type="checkbox" id="createAccount" name="create_account" value="1">-->
+                        <!--      <label class="form-check-label" for="createAccount">-->
+                        <!--        Create an account?-->
+                        <!--      </label>-->
+                        <!--    </div>-->
+                        <!--</div>-->
                     </div>
                     {{--// End address shipping --}}
 
@@ -342,9 +366,10 @@ $layout_page = shop_checkout
                                 {{-- Payment method --}}
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <div class="px-md-5">
                                         <div
                                             class="form-group {{ $errors->has('paymentMethod') ? ' has-error' : '' }}">
-                                            <h3 class="control-label"><i class="fa fa-credit-card-alt"></i>
+                                            <h3 class="control-label mb-4"><i class="fa fa-credit-card-alt"></i>
                                                 {{ gp247_language_render('order.payment_method') }}:<br></h3>
                                             @if($errors->has('paymentMethod'))
                                             <span class="help-block">{{ $errors->first('paymentMethod') }}</span>
@@ -374,6 +399,7 @@ $layout_page = shop_checkout
 
                                             @endforeach
                                         </div>
+                                        </div>
                                     </div>
                                 </div>
                                 {{-- //Payment method --}}
@@ -387,9 +413,11 @@ $layout_page = shop_checkout
                         {{-- Button checkout --}}
                         <div class="row" style="padding-bottom: 20px;">
                             <div class="col-md-12 text-center">
+                                <div class="px-md-5">
                                 <div class="pull-right">
                                     {!! $viewCaptcha ?? ''!!}
-                                    <button class="button button-secondary" type="submit" id="gp247-button-process">{{ gp247_language_render('cart.checkout') }}</button>
+                                    <button class="btn custom-btn" type="submit" id="gp247-button-process">{{ gp247_language_render('cart.checkout') }}</button>
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -398,6 +426,7 @@ $layout_page = shop_checkout
                     </div>
                 </div>
             </form>
+              </div>
         </div>
 
 

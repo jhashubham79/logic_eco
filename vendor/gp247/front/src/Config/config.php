@@ -16,6 +16,7 @@ return [
             // default: front.home, front.locale, front.banner.click will not be displayed with language on url
             'GP247_ROUTE_EXCLUDE_LANGUAGE' => env('GP247_ROUTE_EXCLUDE_LANGUAGE', ''),
         ],
+        
         'GP247_TEMPLATE_FRONT_DEFAULT' => env('GP247_TEMPLATE_FRONT_DEFAULT', 'Default'),
         'GP247_SUFFIX_URL'    => env('GP247_SUFFIX_URL', '.html'), //Suffix url, ex: domain.com/news/1.html 
 

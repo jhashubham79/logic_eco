@@ -24,7 +24,7 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
 @extends($GP247TemplatePath.'.layout')
 
 @section('block_main')
-<section class="section section-xl bg-default text-md-left">
+<section class="section section-xl bg-default text-md-left confirm-checkout cart">
     <div class="container">
         <div class="row">
             @if (count($cartItem) ==0)
@@ -45,9 +45,9 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
                     {{-- Required csrf for secirity --}}
                     @csrf
                     {{--// Required csrf for secirity --}}
-                    <div class="row">
+                    <div class="row justify-content-center">
                         {{-- Display address --}}
-                        <div class="col-12 col-sm-12 col-md-6">
+                        <div class="col-12 col-sm-12 col-md-6 d-none">
                             <h3 class="control-label"><i class="fa fa-truck" aria-hidden="true"></i>
                                 {{ gp247_language_render('cart.shipping_address') }}:<br></h3>
                             <table class="table box table-bordered" id="showTotal">
@@ -99,12 +99,13 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
                         </div>
                         {{--// Display address --}}
 
-                        <div class="col-12 col-sm-12 col-md-6">
+                        <div class="col-12 col-sm-12 col-md-6 py-4">
                             {{-- Total --}}
                             <h3 class="control-label"><br></h3>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <table class="table box table-bordered" id="showTotal">
+                                    <div class="my-orders">
+                                    <table class="table box" id="showTotal">
                                         @foreach ($dataTotal as $key => $element)
                                         @if ($element['code']=='total')
                                         <tr class="showTotal" style="background:#f5f3f3;font-weight: bold;">
@@ -130,14 +131,15 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
                                         @endif
                                         @endforeach
                                     </table>
+                                    
 
 @if (gp247_config('use_payment'))
                                     {{-- Payment method --}}
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <div class="form-group">
-                                                <h3 class="control-label"><i class="fas fa-credit-card"></i>
-                                                    {{ gp247_language_render('order.payment_method') }}:<br></h3>
+                                            <div class="form-group pt-3">
+                                                <h4 class="control-label"><i class="fas fa-credit-card"></i>
+                                                    {{ gp247_language_render('order.payment_method') }}:<br></h4>
                                             </div>
                                             <div class="form-group">
                                                 <div>
@@ -152,6 +154,7 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
                                         </div>
                                     </div>
                                     {{-- //Payment method --}}
+                                    </div>
 @endif
 
                                 </div>
@@ -160,12 +163,12 @@ if (explode('/',$current_url)[$count-1] == "buynow") {
 
                             {{-- Button process cart --}}
                             <div class="row" style="padding-bottom: 20px;">
-                                <div class="col-md-12 text-center">
+                                <div class="col-md-12 text-center py-4">
                                     <div class="pull-left">
-                                        <button onClick="location.href='{{ gp247_route_front('cart') }}'" class="button button-secondary" type="button" id=""><i class="fa fa-arrow-left"></i>{{ gp247_language_render('cart.back_to_cart') }}</button>
+                                        <button onClick="location.href='{{ gp247_route_front('cart') }}'" class="btn custom-btn" type="button" id=""><i class="fa fa-arrow-left me-2"></i>{{ gp247_language_render('cart.back_to_cart') }}</button>
                                     </div>
                                     <div class="pull-right">
-                                        <button class="button button-secondary" type="submit" id="">{{ gp247_language_render('cart.confirm') }}</button>
+                                        <button class="btn custom-btn px-5" type="submit" id="">{{ gp247_language_render('cart.confirm') }}</button>
                                     </div>
                                 </div>
                             </div>

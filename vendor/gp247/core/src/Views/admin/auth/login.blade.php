@@ -3,7 +3,7 @@
 @section('main')
 @include('gp247-core::component.css_login')
     <div class="container-login100">
-      <div class="wrap-login100 main-login">
+      <div class="wrap-login100 main-login bg-white">
         <div class="card-header text-center">
           <a href="{{ gp247_route_admin('home') }}" class="h1">
             <img src="{{ gp247_file(gp247_store_info('logo')) }}" alt="logo" class="logo">
@@ -85,7 +85,7 @@
     @push('styles')
     <style type="text/css">
       .container-login100 {
-        background-image: url({!! gp247_file('GP247/Core/images/bg-system.jpg') !!});
+        background-image: url(/images/signup-bg.webp);
       }
     </style>
     @endpush
